@@ -4,10 +4,23 @@ using System.Text;
 
 namespace Dojo.Net.Webhooks
 {
+    /// <summary>
+    /// Helper class to read and validate webhook payload
+    /// </summary>
     public static class WebhookPayloadUtils
     {
+        /// <summary>
+        /// Signature header name
+        /// </summary>
         public const string SignatureHeaderName = "Dojo-Signature";
 
+        /// <summary>
+        /// Reads and validates webhook payload from the request.
+        /// </summary>
+        /// <param name="requestBody">The request body string.</param>
+        /// <param name="webhookSecret">The webhook secret.</param>
+        /// <param name="signatureHeader">The signature header.</param>
+        /// <returns></returns>
         public static WebhookPayload ReadPayload(string requestBody, string webhookSecret, string signatureHeader)
         {
             if(string.IsNullOrEmpty(requestBody))
