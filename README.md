@@ -54,8 +54,6 @@ builder.Services.AddSingleton<IClientAuthorization>(new ApiKeyClientAuthorizatio
 builder.Services.AddHttpClient<IPaymentIntentsClient, PaymentIntentsClient>();
 ```
 
-You can configure your `HttpClient` as described here [][configure-http-client]
-
 ### Automatic retries
 
 The library does not automatically retries requests on intermittent failures like on a
