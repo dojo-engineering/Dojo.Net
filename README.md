@@ -42,7 +42,7 @@ documentation][api-docs].
 ## Usage
 
 ```c#
-Dojo.Net.PaymentIntentsClient = new PaymentIntentsClient(
+Dojo.Net.PaymentIntentsClient client = new PaymentIntentsClient(
     new HttpClient(),
     new ApiKeyClientAuthorization(apiKey));
 ```
