@@ -13,7 +13,11 @@ jobs:
 
     env:
       BUILD_CONFIG: 'Release'
-      PROJECT: 'src/Dojo.Net.csproj'
+      PROJECT: 'Dojo.Net.csproj'
+
+    defaults:
+      run:
+        working-directory: ./src
 
     runs-on: ubuntu-latest
 
