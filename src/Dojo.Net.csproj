@@ -15,7 +15,7 @@
         <PackageId>Dojo.Net</PackageId>
         <PackageTags>dojo;paymentsense;payment;credit;cards;money;gateway</PackageTags>
         <PackageProjectUrl>https://github.com/dojo-engineering/Dojo.Net</PackageProjectUrl>
-        <PackageLicenseFile>../LICENSE</PackageLicenseFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
         <SignAssembly>True</SignAssembly>
@@ -27,6 +27,10 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\LICENSE" Pack="true" PackagePath="" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
@@ -57,5 +61,4 @@
         <Compile Include=".\Client.g.cs" Link="Client.g.cs" />
         <Compile Include=".\Contracts.g.cs" Link="Contracts.g.cs" />
     </ItemGroup>
-
 </Project>
