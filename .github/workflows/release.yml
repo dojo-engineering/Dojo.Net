@@ -38,8 +38,8 @@ jobs:
       run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
 
 
-    - name: Run Workflow
-      id: Make cert
+    - name: Export certificate
+      id: write_file
       uses: timheuer/base64-to-file@v1.1
       with:
         fileName: 'dojo-tech.cer'
