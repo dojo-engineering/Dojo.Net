@@ -1327,9 +1327,9 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": {
+                  "oneOf": [{
                     "$ref": "#/components/schemas/WebhookViewModel"
-                  }
+                  }]
                 },
                 "example": [
                   {
@@ -1411,9 +1411,9 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": {
+                  "oneOf": [{
                     "$ref": "#/components/schemas/Subscription"
-                  }
+                  }]
                 },
                 "example": [
                   {
@@ -2301,10 +2301,10 @@
         "title": "TransactionSource",
         "example": null
       },
-      "PaymentIntentConfigUserEmail": {
+      "PaymentIntentConfigCustomerEmail": {
         "type": "object",
         "additionalProperties": false,
-        "title": "PaymentIntentConfigUserEmail",
+        "title": "PaymentIntentConfigCustomerEmail",
         "description": "",
         "properties": {
           "collectionRequired": {
@@ -2390,47 +2390,42 @@
           },
           "customerEmail": {
             "nullable": true,
-            "items":
-              {
-                "$ref": "#/components/schemas/PaymentIntentConfigUserEmail"
-              }
-            ,
+            "$ref": "#/components/schemas/PaymentIntentConfigCustomerEmail",
             "description": "Configuration of the client's email address."
           },
           "details": {
             "nullable": true,
-            "items":
+            "oneOf": [
               {
                 "$ref": "#/components/schemas/PaymentIntentConfigDetails"
               }
-            ,
+            ],
             "description": " "
           },
           "billingAddress": {
             "nullable": true,
-            "items":
+            "oneOf": [
               {
                 "$ref": "#/components/schemas/PaymentIntentConfigBillingAddress"
               }
-            ,
+            ],
             "description": "Configuration of the billing address."
           },
           "shippingDetails": {
             "nullable": true,
-            "items":
+            "oneOf":[
               {
                 "$ref": "#/components/schemas/PaymentIntentConfigShippingDetails"
               }
-            ,
+            ],
             "description": " Configuration of the shipping details."
           },
           "payment": {
             "nullable": true,
-            "items":
+            "oneOf":[
               {
                 "$ref": "#/components/schemas/PaymentConfigDetails"
-              }
-            ,
+              }],
             "description": "Configuration of the payment."
           }
         }
@@ -2485,12 +2480,12 @@
             "nullable": true
           },
           "amountTotal": {
-            "items":
+            "nullable": true,
+            "oneOf": [
               {
                 "$ref": "#/components/schemas/Money"
               }
-            ,
-            "description": "The total amount before applying discounts and taxes."
+            ]
           }
         }
       },
@@ -2516,12 +2511,12 @@
             "nullable": true
           },
           "amountTotal": {
+            "nullable": true,
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Money"
               }
-            ],
-            "description": "Total amount of taxes."
+            ]
           }
         }
       },
@@ -2692,25 +2687,25 @@
             "type": "array",
             "description": "The line items purchased by the customer.",
             "nullable": true,
-            "items": {
+            "oneOf": [{
               "$ref": "#/components/schemas/ItemLine"
-            }
+            }]
           },
           "taxLines": {
             "type": "array",
             "description": "The taxes applied to the items.",
             "nullable": true,
-            "items": {
+            "oneOf": [{
               "$ref": "#/components/schemas/TaxLine"
-            }
+            }]
           },
           "paymentMethods": {
             "type": "array",
             "description": "The payment methods that customers can use to pay.",
             "nullable": true,
-            "items": {
+            "oneOf": [{
               "$ref": "#/components/schemas/PaymentMethod"
-            }
+            }]
           },
           "actionLink": {
             "oneOf": [
@@ -2859,9 +2854,9 @@
             "type": "array",
             "description": "The payment methods that customers can use to pay.",
             "nullable": true,
-            "items": {
+            "onrOf": [{
               "$ref": "#/components/schemas/PaymentMethod"
-            }
+            }]
           },
           "amount": {
             "oneOf": [
@@ -2963,19 +2958,19 @@
           },
           "itemLines": {
             "type": "array",
-            "description": "The line items purchased by the customer.",
+            "description": "The line   purchased by the customer.",
             "nullable": true,
-            "items": {
+            "oneOf": [{
               "$ref": "#/components/schemas/ItemLine"
-            }
+            }]
           },
           "taxLines": {
             "type": "array",
             "description": "The taxes applied to the items.",
             "nullable": true,
-            "items": {
+            "oneOf": [{
               "$ref": "#/components/schemas/TaxLine"
-            }
+            }]
           },
           "actionLink": {
             "oneOf": [
@@ -3131,9 +3126,9 @@
             "type": "array",
             "description": "Statuses of payment intents.",
             "nullable": true,
-            "items": {
+            "oneOf": [{
               "$ref": "#/components/schemas/PaymentIntentStatus"
-            }
+            }]
           },
           "startDate": {
             "type": "string",
@@ -3176,9 +3171,9 @@
             "type": "array",
             "nullable": true,
             "description": " ",
-            "items": {
+            "oneOf": [{
               "$ref": "#/components/schemas/PaymentIntent"
-            }
+            }]
           },
           "before": {
             "type": "string",
@@ -3437,9 +3432,9 @@
           "secrets": {
             "type": "array",
             "description": "The list of subscription’s secrets, used to generate signatures.",
-            "items": {
+            "oneOf": [{
               "$ref": "#/components/schemas/SubscriptionSecret"
-            }
+            }]
           },
           "createdAt": {
             "type": "string",
@@ -3496,9 +3491,9 @@
           "secrets": {
             "type": "array",
             "description": "The list of subscription’s secrets, used to generate signatures.",
-            "items": {
+            "oneOf": [{
               "$ref": "#/components/schemas/SubscriptionSecret"
-            }
+            }]
           }
         }
       },

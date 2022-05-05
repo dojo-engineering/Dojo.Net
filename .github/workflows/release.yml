@@ -37,5 +37,17 @@ jobs:
     - name: Run tests
       run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
 
+
+    - name: Run Workflow
+      id: Make cert
+      uses: timheuer/base64-to-file@v1.1
+      with:
+        fileName: 'dojo-tech.cer'
+        fileDir: '.'
+        encodedString: ${{ secrets.NUGET_SIGNING_CERT }}
+
+    - name: Sign
+      run: dotnet nuget sign **\*.nupkg --certificate-path dojo-tech.cer --timestamper http://timestamp.digicert.com
+
     - name: Publish
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
