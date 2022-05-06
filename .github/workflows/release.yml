@@ -45,8 +45,8 @@ jobs:
         fileName: 'sign.cer'
         encodedString: ${{ secrets.NUGET_SIGNING_CERT }}
 
-    - name: Sign
-      run: dotnet nuget sign **\*.nupkg --certificate-path ${{ steps.write_file.outputs.filePath }} --timestamper http://timestamp.digicert.com
+    # - name: Sign
+    #   run: dotnet nuget sign **\*.nupkg --certificate-path ${{ steps.write_file.outputs.filePath }} --timestamper http://timestamp.digicert.com
 
     - name: Publish
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
