@@ -3,6 +3,7 @@
 
 [![NuGet](https://img.shields.io/nuget/v/dojo.net.svg)](https://www.nuget.org/packages/Dojo.net/)
 
+
 The official [Dojo][dojo] .NET library, supporting .NET Standard 2.0+, .NET Core 2.0+, and .NET Framework 4.6.1+.
 
 ## Installation
