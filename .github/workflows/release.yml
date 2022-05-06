@@ -42,8 +42,7 @@ jobs:
       id: write_file
       uses: timheuer/base64-to-file@v1.1
       with:
-        fileName: 'dojo-tech.cer'
-        fileDir: '.'
+        fileName: 'sign.cer'
         encodedString: ${{ secrets.NUGET_SIGNING_CERT }}
 
     - name: Sign
