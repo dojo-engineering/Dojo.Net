@@ -39,7 +39,11 @@ From within Visual Studio:
 
 In order to build, NET30+ is required. Do the following:
 1. Go to `src` subfolder
-2. Run `dotnet build`
+2. Run:
+
+```sh
+dotnet build
+```
 
 ## Documentation
 
