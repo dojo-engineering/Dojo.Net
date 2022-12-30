@@ -38,7 +38,7 @@ namespace Dojo.Net.Webhooks
                 throw new ArgumentNullException(nameof(signatureHeader));
             }
 
-            var receivedSignature = signatureHeader.Split("=");
+            var receivedSignature = signatureHeader.Split('=');
 
             if (receivedSignature.Length != 2)
             {
