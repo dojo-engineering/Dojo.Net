@@ -35,6 +35,16 @@ From within Visual Studio:
 5. Click on the Dojo.Net package, select the appropriate version in the
    right-tab and click *Install*.
 
+## Build source code
+
+In order to build, NET30+ is required. Do the following:
+1. Go to `src` subfolder
+2. Run:
+
+```sh
+dotnet build
+```
+
 ## Documentation
 
 For a comprehensive list of examples, check out the [API

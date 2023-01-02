@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     </PropertyGroup>
 
     <PropertyGroup>
-        <Description>Dojo.net is a sync/async .NET client, and a portable class library for the Dojo API.  (Official Library)</Description>
+        <Description>Dojo.net is a sync/async .NET client, and a portable class library for the Dojo API. (Official Library)</Description>
         <AssemblyTitle>Dojo.Net</AssemblyTitle>
         <VersionPrefix>0.0.1</VersionPrefix>
         <Version>0.0.1</Version>
