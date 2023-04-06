@@ -1,8 +1,6 @@
 # Dojo.Net
 
-
 [![NuGet](https://img.shields.io/nuget/v/dojo.net.svg)](https://www.nuget.org/packages/Dojo.net/)
-
 
 The official [Dojo][dojo] .NET library, supporting .NET Standard 2.0+, .NET Core 2.0+, and .NET Framework 4.6.1+.
 
@@ -38,6 +36,7 @@ From within Visual Studio:
 ## Build source code
 
 In order to build, NET30+ is required. Do the following:
+
 1. Go to `src` subfolder
 2. Run:
 
@@ -81,13 +80,10 @@ For any requests, bug or comments, please [open an issue][issues] or [submit a
 pull request][pulls].
 
 [api-docs]: https://docs.dojo.tech
-[api-keys]: https://portal.dojo.tech/apikeys
 [dotnet-core-cli-tools]: https://docs.microsoft.com/en-us/dotnet/core/tools/
-[dotnet-format]: https://github.com/dotnet/format
 [issues]: https://github.com/dojo-engineering/Dojo.Net/issues
 [nuget-cli]: https://docs.microsoft.com/en-us/nuget/tools/nuget-exe-cli-reference
 [package-manager-console]: https://docs.microsoft.com/en-us/nuget/tools/package-manager-console
 [pulls]: https://github.com/dojo-engineering/Dojo.Net/pulls
 [dojo]: https://dojo.tech
-[configure-http-client]: https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.httpclientfactoryservicecollectionextensions.addhttpclient?view=dotnet-plat-ext-6.0
 [polly]: https://docs.microsoft.com/en-us/dotnet/architecture/microservices/implement-resilient-applications/implement-http-call-retries-exponential-backoff-polly

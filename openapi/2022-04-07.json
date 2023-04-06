@@ -4,2036 +4,17 @@
   "info": {
     "title": "Payment Service",
     "version": "2022-04-07",
-    "description": "**Download OpenAPI specification**: [Download](/bundled.json)\n\n# Introduction\n\nThe Dojo API is RESTful. It returns HTTP response codes to indicate errors. It also\naccepts and returns JSON in the HTTP body.\n\n## Base URLs\n\nUse the following base URL when making requests to the API:  https://api.dojo.tech/\n\n## Looking for no-code solutions?\n\nTry one of our [pre-builded solutions](../docs/plugins/) for your site.\n\n# Authentication\n\nThe Dojo API uses [Basic HTTP auth](https://en.wikipedia.org/wiki/Basic_access_authentication). To generate your API keys, send a request to our [support team](https://support.dojo.tech/hc/en-gb/requests/new).\nSecret keys for the test environment have the prefix `sk_sandbox_` and for production have the prefix `sk_prod_`.\n\nYou must include your secret API key in the header of all requests, for example:\n\n```curl\ncurl\n  --header 'content-type: application/json' \\\n  --header 'Authorization: Basic sk_prod_your_key' \\\n...\n    \n```\n\nAPI requests without authentication will fail.\n\n<SecurityDefinitions />\n\n# HTTP Responses\n\nThe API returns HTTP responses on each request to indicate the success or otherwise of API requests. The various HTTP status codes we might return are listed below.\n\n| Code  | Title | Description |\n|-----|-----|-----|\n|`200`|`OK`| The request was successful. |\n|`400`|`Bad Request`| Bad request, probably due to a syntax error. |\n|`401`|`Unauthorized`| Authentication required. |\n|`402`|`Request Failed`| Over plan quota on this endpoint. |\n|`404`|`Not Found`| The resource doesn't exist. |\n|`405`|`Method Not Allowed`| The used request method isn't supported by that resource, for example using a POST on a resource that requires a GET.\n|`409`|`Conflict`| The request couldn't be completed because it conflicted with another request or the server's configuration. |\n|`50X`|`Internal Server Error`| An error occurred with our API.|\n\n# Errors\n\nDojo follows the error response format proposed in [RFC 7807](https://tools.ietf.org/html/rfc7807) also known as Problem Details for HTTP APIs. All errors are returned in the form of JSON.\n\n## Error Schema\n\nIn case of an error, the response object contains the following fields:\n\n| Field | Type|  Description |\n|-----|-----|-----|\n|`errors`|`object`| A human-readable explanation of errors.|\n|`type`|`string`| A URI reference [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) that identifies the problem type.|\n|`title`|`string`| A short, human-readable summary of the error. |\n|`status`|`integer`| The [HTTP status code](#section/HTTP-Responses). |\n|`traceId`|`string`| The unique identifier of the failing request.|\n|`detail`|`string`| A human-readable message giving more details about the error. Not always present.|\n\nThe following example shows a possible error response:\n\n```json\n{\n    \"errors\": {\n        \"Reference\": [\n            \"The Reference field is required.\"\n        ]\n    },\n    \"type\": \"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\n    \"title\": \"One or more validation errors occurred.\",\n    \"status\": 400,\n    \"traceId\": \"00-a405f077df056a498323ffbcec05923f-aa63e6f4dbbc734a-01\",\n    \n}\n```\n\n# Versioning\n\nDojo API uses the YYYY-MM-DD API version-naming scheme. You have to pass the version as the `version` header in all API calls, for example:\n\n``` curl\ncurl\n  --header 'content-type: application/json' \\\n  --header 'Authorization: Basic sk_prod_your_key' \\\n  --header 'version: 2022-04-07' \\\n    \n```\n\nWhen we make [breaking changes](../docs/development-resources/versioning-overview#breaking-changes) to the API, we release new dated versions.\n\nThe current version is 2022-04-07.\n\n# Postman collection\n\nYou can run the API collection in Postman:\n\n [![Run in Postman](https://run.pstmn.io/button.svg)](https://god.gw.postman.com/run-collection/16735701-b218f555-a7ad-46c4-8ad8-1f11c0aee443?action=collection%2Ffork&collection-url=entityId%3D16735701-b218f555-a7ad-46c4-8ad8-1f11c0aee443%26entityType%3Dcollection%26workspaceId%3Dfdd152df-0154-428c-aeb4-1b90e46b8523)",
+    "description": "# Introduction\n\nThe Dojo API is RESTful. It returns HTTP response codes to indicate errors. It also\naccepts and returns JSON in the HTTP body.\n\n## Base URLs\n\nUse the following base URL when making requests to the API:  https://api.dojo.tech/\n\n## Looking for no-code solutions?\n\nTry one of our [pre-built solutions](../docs/plugins/) for your site.\n\n# Authentication\n\nThe Dojo API uses [Basic HTTP auth](https://en.wikipedia.org/wiki/Basic_access_authentication). You can generate API keys in [Developer Portal](https://developer.dojo.tech).\nSecret keys for the test environment have the prefix `sk_sandbox_` and for production have the prefix `sk_prod_`.\n\nYou must include your secret API key in the header of all requests, for example:\n\n```curl\ncurl\n  --header 'content-type: application/json' \\\n  --header 'Authorization: Basic sk_prod_your_key' \\\n...\n```\n\nAPI requests without authentication will fail.\n\n# HTTP Responses\n\nThe API returns standard HTTP response codes [RFC 7231](https://tools.ietf.org/html/rfc7231#section-6) on each request to indicate the success or otherwise of API requests. HTTP status codes summary are listed below:\n\n* `200 OK`—The request was successful.\n\n* `201 Created`—The request was successful, and a new resource was created as a result.\n\n* `204 No Content`—The request was successful, but there is no content to send.\n\n* `400 Bad Request`—Bad request, probably due to a syntax error.\n\n* `401 Unauthorized`—Authentication required.\n\n* `403 Forbidden`—The API key doesn't have permissions.\n\n* `404 Not Found`—The resource doesn't exist.\n\n* `405 Method Not Allowed`—The request method is known by the server but isn't supported by the target resource.\n\n* `409 Conflict`—The request couldn't be completed because it conflicted with another request or the server's configuration.\n\n* `500`, `502`, `503`, `504` `Server Errors`—An error occurred with our API.\n\n# Errors\n\nDojo follows the error response format proposed in [RFC 7807](https://tools.ietf.org/html/rfc7807) also known as Problem Details for HTTP APIs. All errors are returned in the form of JSON.\n\n## Error Schema\n\nIn case of an error, the response object contains the following fields:\n\n* `errors` [object]—A human-readable explanation of errors.\n\n* `type` [string]—\nA URI reference RFC 3986 that identifies the problem type.\n\n* `title` [string]—A short, human-readable summary of the error.\n\n* `status` [integer]—The HTTP status code.\n\n* `detail` [string]—A human-readable message giving more details about the error. Not always present.\n\n* `traceId` [string]—The unique identifier of the failing request.\n\nThe following example shows a possible error response:\n\n```json\n{\n    \"errors\": {\n        \"Reference\": [\n            \"The Reference field is required.\"\n        ]\n    },\n    \"type\": \"https://tools.ietf.org/html/rfc7231#section-6.5.1\",\n    \"title\": \"One or more validation errors occurred.\",\n    \"status\": 400,\n    \"traceId\": \"00-a405f077df056a498323ffbcec05923f-aa63e6f4dbbc734a-01\",\n}\n```\n\n# Versioning\n\nDojo API uses the yyyy-mm-dd API version-naming scheme. You have to pass the version as the `version` header in all API calls, for example:\n\n``` curl\ncurl\n  --header 'content-type: application/json' \\\n  --header 'Authorization: Basic sk_prod_your_key' \\\n  --header 'version: 2022-04-07' \\\n```\n\nWhen we make [breaking changes](../docs/development-resources/versioning-overview#breaking-changes) to the API, we release new dated versions.\n\nThe current version is `2022-04-07`.\n\n# Postman collection\n\nYou can run the API collection in Postman:\n\n [![Run in Postman](https://run.pstmn.io/button.svg)](https://god.gw.postman.com/run-collection/16735701-b218f555-a7ad-46c4-8ad8-1f11c0aee443?action=collection%2Ffork&collection-url=entityId%3D16735701-b218f555-a7ad-46c4-8ad8-1f11c0aee443%26entityType%3Dcollection%26workspaceId%3Dfdd152df-0154-428c-aeb4-1b90e46b8523)",
     "termsOfService": "https://dojo.tech/legal/",
     "contact": {
       "name": "Dojo Developer Experience Team"
     }
   },
-  "servers": [
+  "security": [
     {
-      "url": "https://api.dojo.tech"
+      "BasicAuth": []
     }
   ],
-  "tags": [
-    {
-      "name": "Payment intents",
-      "description": "Allows you to take and manage payments.\n\n**Documentation**: [Payments](../docs/accept-payments/)"
-    },
-    {
-      "name": "Refunds",
-      "description": "Allows you to manage a refund for payments.\n\n**Documentation**: [Refunds](../docs/manage-payments/cancellation-payments/refund/)"
-    },
-    {
-      "name": "Reversal",
-      "description": "Allows you to create a reversal for payments.\n\n**Documentation**: [Reversal](../docs/manage-payments/cancellation-payments/reversal/)"
-    },
-    {
-      "name": "Captures",
-      "description": "Allows you to capture the full payment amount or part of the amount.\n\n**Documentation**: [Captures](../docs/manage-payments/capture/)"
-    },
-    {
-      "name": "Webhooks",
-      "description": "Webhooks notify you when a specific event has occurred. \n\n**Documentation**: [Webhooks](../docs/development-resources/webhooks/)"
-    }
-  ],
-  "x-tagGroup": [
-    {
-      "name": "Payments",
-      "tags": [
-        "Payment intents",
-        "Refunds",
-        "Reversal",
-        "Captures"
-      ]
-    },
-    {
-      "name": "Notifications",
-      "tags": [
-        "Webhooks"
-      ]
-    }
-  ],
-  "paths": {
-    "/payment-intents": {
-      "post": {
-        "tags": [
-          "Payment intents"
-        ],
-        "summary": "Create a payment intent",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          }
-        ],
-        "description": "Creates a payment intent.",
-        "operationId": "PaymentIntents_CreatePaymentIntent",
-        "requestBody": {
-          "x-name": "createPaymentIntentRequest",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreatePaymentIntentRequest",
-                "examples": {}
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentIntent"
-                },
-                "example": {
-                  "id": "pi_SMqqJwmMTk6o44wmXde3KA",
-                  "captureMode\"": "Auto",
-                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
-                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
-                  "status": "Created",
-                  "paymentMethods": [
-                    "Card"
-                  ],
-                  "amount": {
-                    "value": 1000,
-                    "currencyCode\"": "GBP"
-                  },
-                  "totalAmount": {
-                    "value": 1000,
-                    "currencyCode": "GBP"
-                  },
-                  "createdAt": "2022-02-21T14:39:21.6050276Z",
-                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
-                  "reference": "Order 234",
-                  "description": "Demo payment intent",
-                  "itemLines": [],
-                  "taxLines": [],
-                  "metadata": {}
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ]
-      }
-    },
-    "/payment-intents/{paymentIntentId}": {
-      "get": {
-        "tags": [
-          "Payment intents"
-        ],
-        "operationId": "PaymentIntents_Get",
-        "parameters": [
-          {
-            "name": "paymentIntentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Unique identifier for the payment intent.\n",
-            "x-position": 1,
-            "example": "pi_SMqqJwmMTk6o44wmXde3KA"
-          },
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentIntent"
-                },
-                "example": {
-                  "id": "pi_SMqqJwmMTk6o44wmXde3KA",
-                  "captureMode\"": "Auto",
-                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
-                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
-                  "status": "Created",
-                  "paymentMethods": [
-                    "Card"
-                  ],
-                  "amount": {
-                    "value": 1000,
-                    "currencyCode\"": "GBP"
-                  },
-                  "totalAmount": {
-                    "value": 1000,
-                    "currencyCode": "GBP"
-                  },
-                  "createdAt": "2022-02-21T14:39:21.6050276Z",
-                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
-                  "reference": "Order 234",
-                  "description": "Demo payment intent",
-                  "itemLines": [],
-                  "taxLines": [],
-                  "metadata": {}
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "description": "Retrieves the details of a payment intent.",
-        "summary": "Retrieve a payment intent"
-      },
-      "delete": {
-        "tags": [
-          "Payment intents"
-        ],
-        "operationId": "PaymentIntents_Delete",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "paymentIntentId",
-            "description": "Unique identifier for the payment intent.\n",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "example": "pi_SMqqJwmMTk6o44wmXde3KA"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentIntent"
-                },
-                "example": {
-                  "id": "pi_SMqqJwmMTk6o44wmXde3KA",
-                  "captureMode\"": "Auto",
-                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
-                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
-                  "status": "Canceled",
-                  "paymentMethods": [
-                    "Card"
-                  ],
-                  "amount": {
-                    "value": 1000,
-                    "currencyCode\"": "GBP"
-                  },
-                  "totalAmount": {
-                    "value": 1000,
-                    "currencyCode": "GBP"
-                  },
-                  "createdAt": "2022-02-21T14:39:21.6050276Z",
-                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
-                  "reference": "Order 234",
-                  "description": "Demo payment intent",
-                  "itemLines": [],
-                  "taxLines": [],
-                  "metadata": {}
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "Cancel a payment intent",
-        "description": "Cancels a payment intent. The payment intent can be canceled if it's in the `Created` status. After cancellation, the payment intent will change the status to `Canceled` and any operations on the payment intent will fail with an error."
-      }
-    },
-    "/payment-intents/{paymentIntentId}/captures": {
-      "post": {
-        "tags": [
-          "Captures"
-        ],
-        "summary": "Captures a payment",
-        "description": "Captures a payment intent that has previously been created but not yet refunded or reversed. You can capture the full amount or a partial amount.",
-        "operationId": "Captures_Create",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "paymentIntentId",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for the payment intent.\n",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "example": "pi_SMqqJwmMTk6o44wmXde3KA"
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateCaptureRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Capture"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ]
-      }
-    },
-    "/payment-intents/{paymentIntentId}/refresh-client-session-secret": {
-      "post": {
-        "tags": [
-          "Payment intents"
-        ],
-        "operationId": "PaymentIntents_RefreshClientSessionSecret",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "paymentIntentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Unique identifier for the payment intent.\n",
-            "x-position": 1,
-            "example": "pi_SMqqJwmMTk6o44wmXde3KA"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentIntent"
-                },
-                "example": {
-                  "id": "pi_SMqqJwmMTk6o44wmXde3KA",
-                  "captureMode\"": "Auto",
-                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
-                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
-                  "status": "Created",
-                  "paymentMethods": [
-                    "Card"
-                  ],
-                  "amount": {
-                    "value": 1000,
-                    "currencyCode\"": "GBP"
-                  },
-                  "totalAmount": {
-                    "value": 1000,
-                    "currencyCode": "GBP"
-                  },
-                  "createdAt": "2022-02-21T14:39:21.6050276Z",
-                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
-                  "reference": "Order 234",
-                  "description": "Demo payment intent",
-                  "itemLines": [],
-                  "taxLines": [],
-                  "metadata": {}
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "Update a client session secret",
-        "description": "Updates a client session secret."
-      }
-    },
-    "/payment-intents/search": {
-      "post": {
-        "tags": [
-          "Payment intents"
-        ],
-        "operationId": "PaymentIntents_Search",
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchPaymentIntentRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PagedPaymentIntent"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          }
-        ],
-        "summary": "List all payment intents",
-        "description": "Retrieves a list of payment intents.\nResults are paginated, by default the method returns up to 50 payment intents."
-      }
-    },
-    "/payment-intents/{paymentIntentId}/tips-amount": {
-      "post": {
-        "tags": [
-          "Payment intents"
-        ],
-        "operationId": "PaymentIntents_SetTipsAmount",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "paymentIntentId",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for the payment intent.\n",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "example": "pi_SMqqJwmMTk6o44wmXde3KA"
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetTipsAmountRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentIntent"
-                },
-                "example": {
-                  "id": "pi_SMqqJwmMTk6o44wmXde3KA",
-                  "captureMode\"": "Auto",
-                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
-                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
-                  "status": "Created",
-                  "paymentMethods": [
-                    "Card"
-                  ],
-                  "amount": {
-                    "value": 1000,
-                    "currencyCode\"": "GBP"
-                  },
-                  "totalAmount": {
-                    "value": 1000,
-                    "currencyCode": "GBP"
-                  },
-                  "createdAt": "2022-02-21T14:39:21.6050276Z",
-                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
-                  "reference": "Order 234",
-                  "description": "Demo payment intent",
-                  "itemLines": [],
-                  "taxLines": [],
-                  "metadata": {}
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Method not allowed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "Change tips amount",
-        "description": "Changes tips amount for a payment intent. Available if you allowed tips when creating this payment intent."
-      }
-    },
-    "/payment-intents/{paymentIntentId}/amount": {
-      "post": {
-        "tags": [
-          "Payment intents"
-        ],
-        "operationId": "PaymentIntents_SetCustomAmount",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "paymentIntentId",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for the payment intent.\n",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "example": "pi_SMqqJwmMTk6o44wmXde3KA"
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetAmountRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 2
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PaymentIntent"
-                },
-                "example": {
-                  "id": "pi_SMqqJwmMTk6o44wmXde3KA",
-                  "captureMode\"": "Auto",
-                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
-                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
-                  "status": "Created",
-                  "paymentMethods": [
-                    "Card"
-                  ],
-                  "amount": {
-                    "value": 1000,
-                    "currencyCode\"": "GBP"
-                  },
-                  "totalAmount": {
-                    "value": 1000,
-                    "currencyCode": "GBP"
-                  },
-                  "createdAt": "2022-02-21T14:39:21.6050276Z",
-                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
-                  "reference": "Order 234",
-                  "description": "Demo payment intent",
-                  "itemLines": [],
-                  "taxLines": [],
-                  "metadata": {}
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "405": {
-            "description": "Method not allowed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Change a payment intent amount",
-        "description": "Changes the amount for a payment intent. Available if you allowed the amount changes when creating this payment intent.",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ]
-      }
-    },
-    "/payment-intents/{paymentIntentId}/receipt": {
-      "post": {
-        "tags": [
-          "Payment intents"
-        ],
-        "summary": "Send a receipt",
-        "description": "Sends a receipt to the email addresses you specified.",
-        "operationId": "Receipt_Create",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "paymentIntentId",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for the payment intent.\n",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "example": "pi_SMqqJwmMTk6o44wmXde3KA"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Payment receipt requested successfully."
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SendEmailReceiptRequest"
-              }
-            }
-          },
-          "description": ""
-        }
-      },
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "paymentIntentId",
-          "in": "path",
-          "required": true
-        }
-      ]
-    },
-    "/payment-intents/{paymentIntentId}/refunds": {
-      "post": {
-        "tags": [
-          "Refunds"
-        ],
-        "summary": "Create a refund",
-        "description": "Creates a refund. Refund allows you to return a payment that has previously been created but not yet refunded. You can refund the full amount or a partial amount.",
-        "operationId": "Refunds_Create",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "paymentIntentId",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for the payment intent.\n",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          },
-          {
-            "name": "idempotencyKey",
-            "x-originalName": "idempotencyKey",
-            "in": "header",
-            "required": true,
-            "description": " An optional idempotency key to recognize subsequent retries of the same request. How you generate the idempotency key is up to you. Must be unique for each new refund for the payment intent.",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2
-          }
-        ],
-        "requestBody": {
-          "x-name": "createRefundRequest",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateRefundRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 3,
-          "description": ""
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Refund"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ]
-      }
-    },
-    "/payment-intents/refunds/{refundId}": {
-      "get": {
-        "tags": [
-          "Refunds"
-        ],
-        "operationId": "PaymentIntents_GetRefundById",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "refundId",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for the refund.",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Refund"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "description": "Retrieves the details of a refund that has previously been created.",
-        "summary": "Retrieve a refund"
-      }
-    },
-    "/payment-intents/{paymentIntentId}/reversal": {
-      "post": {
-        "tags": [
-          "Reversal"
-        ],
-        "summary": "Create a reversal",
-        "description": "Reverses a payment intent.",
-        "operationId": "Reversal_Create",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "paymentIntentId",
-            "in": "path",
-            "required": true,
-            "description": "Unique identifier for the payment intent.\n",
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Reversal"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ]
-      }
-    },
-    "/webhooks/events": {
-      "get": {
-        "tags": [
-          "Webhooks"
-        ],
-        "operationId": "Webhooks_GetAllWebhooks",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "List all webhooks",
-        "description": "Retrieves a list of all events.",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/WebhookViewModel"
-                  }
-                },
-                "example": [
-                  {
-                    "model": "PaymentIntent",
-                    "events": [
-                      "payment_intent.created",
-                      "payment_intent.updated"
-                    ]
-                  },
-                  {
-                    "model": "Payment",
-                    "events": [
-                      "payment.successful"
-                    ]
-                  },
-                  {
-                    "model": "Order",
-                    "events": [
-                      "order.created"
-                    ]
-                  }
-                ]
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/webhooks": {
-      "get": {
-        "tags": [
-          "Webhooks"
-        ],
-        "operationId": "Webhooks_GetAlSubscriptions",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "List all subscriptions",
-        "description": "Retrieves a list of all subscriptions.",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Subscription"
-                  }
-                },
-                "example": [
-                  {
-                    "id": "ws_aNkU6yob0vOMxUlghg2oynUw",
-                    "accountId": 12345,
-                    "events": [
-                      "payment_intent.created",
-                      "payment_intent.status_updated"
-                    ],
-                    "url": "https://example.com.com/incoming-events",
-                    "secrets": [
-                      {
-                        "id": "sc_qNkU6yob0vOMxUlb2oynUw",
-                        "value": "U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ",
-                        "createdAt": "2021-12-13T14:15:01",
-                        "lastUsedAt": "2021-12-16T13:44:03.3242202Z",
-                        "isActive": true
-                      }
-                    ],
-                    "createdAt": "2022-03-30T12:21:04.143Z",
-                    "updatedAt": "2022-03-30T12:21:04.143Z"
-                  }
-                ]
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Webhooks"
-        ],
-        "operationId": "Webhooks_Subscribe",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "Subscribe to an event",
-        "description": "Creates a new subscription.",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubscriptionRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SecretsResponse"
-                },
-                "example": {
-                  "id": "ws_lgQzejyXb0SD8oIDE2zcqA",
-                  "secrets": [
-                    {
-                      "id": "sc_qNkU6yob0vOMxUlb2oynUw",
-                      "value": "U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ",
-                      "createdAt": "2021-12-13T14:15:01",
-                      "lastUsedAt": "2021-12-16T13:44:03.3533309Z",
-                      "isActive": true
-                    },
-                    {
-                      "id": "sc_zNkU6yob0vOMxUlb2oynUw",
-                      "value": "FGswesdsaXB0aW9uUmVzcG9wbGVQcm92aWRlcjxTdWJ",
-                      "createdAt": "2020-12-13T14:15:01",
-                      "lastUsedAt": "2021-12-02T13:58:03.3533322Z",
-                      "isActive": false
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/webhooks/{subscriptionId}/secrets": {
-      "get": {
-        "tags": [
-          "Webhooks"
-        ],
-        "operationId": "Webhooks_GetSecrets",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "List all secrets",
-        "description": "Retrieves a list of all secrets.",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "subscriptionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "description": "Unique identifier for the subscription."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SecretsResponse"
-                },
-                "example": {
-                  "id": "ws_lgQzejyXb0SD8oIDE2zcqA",
-                  "secrets": [
-                    {
-                      "id": "sc_qNkU6yob0vOMxUlb2oynUw",
-                      "value": "U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ",
-                      "createdAt": "2021-12-13T14:15:01",
-                      "lastUsedAt": "2021-12-16T13:44:03.3656144Z",
-                      "isActive": true
-                    },
-                    {
-                      "id": "sc_zNkU6yob0vOMxUlb2oynUw",
-                      "value": "FGswesdsaXB0aW9uUmVzcG9wbGVQcm92aWRlcjxTdWJ",
-                      "createdAt": "2020-12-13T14:15:01",
-                      "lastUsedAt": "2021-12-02T13:58:03.3656159Z",
-                      "isActive": false
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Webhooks"
-        ],
-        "operationId": "Webhooks_GenerateSecret",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "Generate a secret",
-        "description": "Generates a new secret.",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "subscriptionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "description": "Unique identifier for the subscription."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SecretsResponse"
-                },
-                "example": {
-                  "secrets": [
-                    {
-                      "id": "sc_qNkU6yob0vOMxUlb2oynUw",
-                      "value": "U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ",
-                      "createdAt": "2021-12-13T14:15:01",
-                      "lastUsedAt": "2021-12-16T13:44:03.3683851Z",
-                      "isActive": true
-                    },
-                    {
-                      "id": "sc_zNkU6yob0vOMxUlb2oynUw",
-                      "value": "FGswesdsaXB0aW9uUmVzcG9wbGVQcm92aWRlcjxTdWJ",
-                      "createdAt": "2020-12-13T14:15:01",
-                      "lastUsedAt": "2021-12-02T13:58:03.3683861Z",
-                      "isActive": false
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/webhooks/{subscriptionId}/secrets/{secretId}/activate": {
-      "put": {
-        "tags": [
-          "Webhooks"
-        ],
-        "operationId": "Webhooks_ActivateSecret",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "Activate a secret",
-        "description": "Activates a secret.",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "subscriptionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "description": "Unique identifier for the subscription."
-          },
-          {
-            "name": "secretId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2,
-            "description": "Unique identifier for the secret."
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/webhooks/{subscriptionId}/secrets/{secretId}": {
-      "delete": {
-        "tags": [
-          "Webhooks"
-        ],
-        "operationId": "Webhooks_DeleteSecret",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "Delete a secret",
-        "description": "Deletes a secret.",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "subscriptionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "description": "Unique identifier for the subscription."
-          },
-          {
-            "name": "secretId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 2,
-            "description": "Unique identifier for the secret."
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/webhooks/{subscriptionId}": {
-      "patch": {
-        "tags": [
-          "Webhooks"
-        ],
-        "operationId": "Webhooks_SubscribeUpdate",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "Update a webhook",
-        "description": "Updates you subscription details. You can change the URL or the list of events.",
-        "parameters": [
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          },
-          {
-            "name": "subscriptionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "description": "Unique identifier for the subscription."
-          }
-        ],
-        "requestBody": {
-          "x-name": "request",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SubscriptionUpdateRequest"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Webhooks"
-        ],
-        "operationId": "Webhooks_DeleteSubscriptions",
-        "security": [
-          {
-            "BasicAuth": []
-          }
-        ],
-        "summary": "Delete a subscription",
-        "description": "Deletes a subscription.",
-        "parameters": [
-          {
-            "name": "subscriptionId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "x-position": 1,
-            "description": "Unique identifier for the subscription."
-          },
-          {
-            "name": "version",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "date"
-            },
-            "example": "2022-04-07",
-            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
   "components": {
     "securitySchemes": {
       "BasicAuth": {
@@ -2053,7 +34,7 @@
           "Auto",
           "Manual"
         ],
-        "description": "The type of capture for the payment.",
+        "description": "",
         "default": "Auto"
       },
       "Money": {
@@ -2084,6 +65,11 @@
         "type": "object",
         "additionalProperties": false,
         "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Unique identifier of the customer."
+          },
           "emailAddress": {
             "type": "string",
             "description": "The customer's email address.",
@@ -2196,15 +182,6 @@
           }
         }
       },
-      "TransactionSource": {
-        "type": "string",
-        "description": "`MOTO` if the source of the transaction is mail or phone. Otherwise, this field is null.",
-        "enum": [
-          "MOTO"
-        ],
-        "title": "TransactionSource",
-        "example": null
-      },
       "PaymentIntentConfigCustomerEmail": {
         "type": "object",
         "additionalProperties": false,
@@ -2224,11 +201,11 @@
         "properties": {
           "showTotal": {
             "type": "boolean",
-            "description": "If has the value `true` the total will be showed."
+            "description": "If has the value `true`, the total order amount will be showed."
           },
           "showReference": {
             "type": "boolean",
-            "description": "If has the value true the order id  will be showed."
+            "description": "If has the value `true`, the order reference id will be showed."
           }
         }
       },
@@ -2277,7 +254,7 @@
         "properties": {
           "title": {
             "type": "string",
-            "description": "The title of the payment intent.",
+            "description": "The [checkout page’s title](docs/accept-payments/checkout-page/configuration#add-information-about-your-company).",
             "nullable": true
           },
           "redirectUrl": {
@@ -2308,7 +285,7 @@
                 "$ref": "#/components/schemas/PaymentIntentConfigDetails"
               }
             ],
-            "description": " "
+            "description": "The following configuration details of the payment intent. See [detailed information about the order and taxes](docs/accept-payments/checkout-page/configuration#show-detailed-information-about-the-order-and-taxes).\n\n- The total order amount including tax.\n- The order reference id.\n"
           },
           "billingAddress": {
             "nullable": true,
@@ -2488,7 +465,7 @@
       },
       "AutoExpireAction": {
         "type": "string",
-        "description": "The action that happens with this payment intent after the date set in the `autoExpireAt`parameter.\nOnly avalible if `captureMode: Manual`.",
+        "description": "The action that happens with this payment intent after the date set in the `autoExpireAt` parameter.\nOnly available and required if `captureMode: Manual`.\n",
         "x-enumNames": [
           "Release",
           "Capture"
@@ -2505,7 +482,7 @@
         "title": "CreatePaymentIntentRequest",
         "properties": {
           "captureMode": {
-            "description": "The type of capture for the payment.",
+            "description": "The type of capture for the payment:\n\n- `Auto`—(Default) payments are captured automatically after authorization\n\n- `Manual`—payments are captured by making a request [POST /payment-intents/{paymentIntentId}/captures](https://docs.dojo.tech/api#operation/Captures_Create)",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/CaptureMode"
@@ -2566,15 +543,6 @@
             ],
             "description": "The address where to send the order."
           },
-          "transactionSource": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TransactionSource"
-              }
-            ],
-            "description": "Information about the transaction source type."
-          },
           "config": {
             "nullable": true,
             "oneOf": [
@@ -2624,18 +592,13 @@
             ],
             "description": "The link to the payment's associated actions."
           },
-          "manualAutoExpireAction": {
+          "autoExpireAction": {
             "$ref": "#/components/schemas/AutoExpireAction"
           },
-          "manualAutoExpireAt": {
+          "autoExpireAt": {
             "type": "string",
             "format": "date-time",
-            "description": "The timestamp of the date when this payment intent will be captured or reversed, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.\nOnly avalible if `captureMode: Manual`."
-          },
-          "paymentSource": {
-            "type": "string",
-            "description": "Information about the payment source type.",
-            "nullable": true
+            "description": "The timestamp of the date when this payment intent will be captured or reversed, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.\nOnly available and required if `captureMode: Manual`."
           },
           "metadata": {
             "type": "object",
@@ -2715,6 +678,73 @@
           "Canceled"
         ]
       },
+      "CardScheme": {
+        "type": "string",
+        "description": "Supported card schemes.",
+        "x-enumNames": [
+          "VISA",
+          "MASTERCARD",
+          "MAESTRO",
+          "AMEX"
+        ],
+        "enum": [
+          "VISA",
+          "MASTERCARD",
+          "MAESTRO",
+          "AMEX"
+        ]
+      },
+      "Wallet": {
+        "type": "string",
+        "description": "Wallet payment options.",
+        "x-enumNames": [
+          "APPLE_PAY",
+          "GOOGLE_PAY"
+        ],
+        "enum": [
+          "APPLE_PAY",
+          "GOOGLE_PAY"
+        ]
+      },
+      "SupportedPaymentMethods": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "cardSchemes": {
+            "type": "array",
+            "nullable": true,
+            "description": "Supported card schemes.",
+            "items": {
+              "$ref": "#/components/schemas/CardScheme"
+            }
+          },
+          "wallets": {
+            "type": "array",
+            "nullable": true,
+            "description": "List of supported payment wallets.",
+            "items": {
+              "$ref": "#/components/schemas/Wallet"
+            }
+          }
+        }
+      },
+      "MerchantConfig": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Details about the merchant configuration.",
+        "title": "MerchantConfig",
+        "properties": {
+          "supportedPaymentMethods": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SupportedPaymentMethods"
+              }
+            ],
+            "description": "Supported payment methods."
+          }
+        }
+      },
       "PaymentIntent": {
         "type": "object",
         "additionalProperties": false,
@@ -2728,15 +758,6 @@
           },
           "captureMode": {
             "$ref": "#/components/schemas/CaptureMode"
-          },
-          "transactionSource": {
-            "nullable": true,
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/TransactionSource"
-              }
-            ],
-            "description": "Information about the transaction source type."
           },
           "clientSessionSecret": {
             "type": "string",
@@ -2801,6 +822,15 @@
               }
             ],
             "description": "The total amount after applying discounts and taxes."
+          },
+          "refundedAmount": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount that was [refunded](https://docs.dojo.tech/docs/manage-payments/cancellation-payments/refund)."
           },
           "customer": {
             "nullable": true,
@@ -2898,18 +928,22 @@
             ],
             "description": "Details about the payment intent configuration."
           },
-          "manualAutoExpireAction": {
+          "merchantConfig": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MerchantConfig"
+              }
+            ],
+            "description": "Details of payment intent merchant configuration."
+          },
+          "autoExpireAction": {
             "$ref": "#/components/schemas/AutoExpireAction"
           },
-          "manualAutoExpireAt": {
+          "expireAt": {
             "type": "string",
             "format": "date-time",
-            "description": "The timestamp of the date when this payment intent will be captured or reversed, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.\nOnly avalible if `captureMode: Manual`."
-          },
-          "paymentSource": {
-            "type": "string",
-            "description": "Information about the payment source type.",
-            "nullable": true
+            "description": "The timestamp of the date when this payment intent will be captured or reversed, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.\nOnly available and required if `captureMode: Manual`."
           },
           "metadata": {
             "type": "object",
@@ -3011,12 +1045,12 @@
           },
           "before": {
             "type": "string",
-            "description": "A cursor for use in pagination for the previous page. `before` and `after` are mutually exclusive - only one of these may be used.",
+            "description": "A cursor for use in pagination for the previous page. `before` and `after` are mutually exclusive—only one of these may be used.",
             "nullable": true
           },
           "after": {
             "type": "string",
-            "description": "A cursor for use in pagination for the next page. `before` and `after` are mutually exclusive - only one of these may be used.",
+            "description": "A cursor for use in pagination for the next page. `before` and `after` are mutually exclusive—only one of these may be used.",
             "nullable": true
           }
         }
@@ -3026,11 +1060,6 @@
         "additionalProperties": false,
         "description": "",
         "properties": {
-          "paymentSource": {
-            "type": "string",
-            "description": "Information about the payment source type.",
-            "nullable": true
-          },
           "statuses": {
             "type": "array",
             "description": "Statuses of payment intents.",
@@ -3079,19 +1108,19 @@
           "data": {
             "type": "array",
             "nullable": true,
-            "description": " ",
+            "description": "An array of payment intents.",
             "items": {
               "$ref": "#/components/schemas/PaymentIntent"
             }
           },
           "before": {
             "type": "string",
-            "description": "A cursor for use in pagination for the previous page. `before` and `after` are mutually exclusive - only one of these may be used.",
+            "description": "A cursor for use in pagination for the previous page.",
             "nullable": true
           },
           "after": {
             "type": "string",
-            "description": "A cursor for use in pagination for the next page. `before` and `after` are mutually exclusive - only one of these may be used.",
+            "description": "A cursor for use in pagination for the next page.",
             "nullable": true
           }
         }
@@ -3192,11 +1221,6 @@
             "description": "The refund amount.",
             "format": "int64"
           },
-          "previousTransactionId": {
-            "type": "string",
-            "description": "Unique identifier for the previous transaction.",
-            "nullable": true
-          },
           "refundReason": {
             "type": "string",
             "description": "The reason for the refund.",
@@ -3240,7 +1264,7 @@
         "description": "The refund response object.",
         "title": "Refund",
         "example": {
-          "paymentIntentId": "pi_gfygdkh34261d",
+          "paymentIntentId": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw",
           "refundId": "rfnd_127usj",
           "refundReason": "Demo refund",
           "notes": null
@@ -3273,7 +1297,8 @@
         "additionalProperties": false,
         "properties": {
           "model": {
-            "type": "string"
+            "type": "string",
+            "description": "The webhook type."
           },
           "events": {
             "type": "array",
@@ -3310,10 +1335,6 @@
       "Subscription": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "events",
-          "url"
-        ],
         "properties": {
           "id": {
             "type": "string",
@@ -3337,6 +1358,10 @@
             "format": "uri",
             "minLength": 1,
             "pattern": "^https://*.+"
+          },
+          "description": {
+            "type": "string",
+            "description": "The subscription description."
           },
           "secrets": {
             "type": "array",
@@ -3386,6 +1411,10 @@
             "minLength": 1,
             "pattern": "^https://*.+",
             "description": "The URL of your webhook endpoint."
+          },
+          "description": {
+            "type": "string",
+            "description": "The subscription description."
           }
         }
       },
@@ -3428,6 +1457,2937 @@
             "description": "The URL of your webhook endpoint.",
             "format": "uri",
             "pattern": "^https://*.+"
+          },
+          "description": {
+            "type": "string",
+            "description": "The subscription description."
+          }
+        }
+      },
+      "CreateCustomerRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "name": "Alex",
+          "emailAddress": "alex@dojo.com"
+        },
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The customer's name."
+          },
+          "shippingAddress": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ],
+            "description": "The address where to send the order."
+          },
+          "billingAddress": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ],
+            "description": "The address where to send the invoice."
+          },
+          "emailAddress": {
+            "type": "string",
+            "description": "The customer's email address.",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "The customer's phone number.",
+            "nullable": true
+          },
+          "vatNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "The VAT number of the customer."
+          }
+        }
+      },
+      "CustomerFull": {
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "id": "cs_qNkU6yob0vOMxUlb2oynUw",
+          "name": "Alex",
+          "emailAddress": "alex@dojo.com",
+          "documentVersion": 0,
+          "createdAt": "2019-08-24T14:15:22Z"
+        },
+        "properties": {
+          "id": {
+            "type": "string",
+            "nullable": true,
+            "description": "Unique identifier of the customer."
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The customer's name."
+          },
+          "shippingAddress": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ],
+            "description": "The address where to send the order."
+          },
+          "billingAddress": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ],
+            "description": "The address where to send the invoice."
+          },
+          "emailAddress": {
+            "type": "string",
+            "description": "The customer's email address.",
+            "nullable": true
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "The customer's phone number.",
+            "nullable": true
+          },
+          "vatNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "The VAT number of the customer."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The timestamp of the create date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format."
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The timestamp of the update date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format."
+          },
+          "documentVersion": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The version of the customer's data, updated with every change."
+          }
+        }
+      },
+      "UpdateCustomerRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "phoneNumber": "078976534161"
+        },
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "description": "The customer's name."
+          },
+          "billingAddress": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ],
+            "description": "The address where to send the invoice."
+          },
+          "shippingAddress": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Address"
+              }
+            ],
+            "description": "The address where to send the order."
+          },
+          "emailAddress": {
+            "type": "string",
+            "nullable": true,
+            "description": "The customer's email address."
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "The customer's phone number."
+          },
+          "vatNumber": {
+            "type": "string",
+            "nullable": true,
+            "description": "The VAT number of the customer."
+          }
+        }
+      },
+      "CustomerSecret": {
+        "type": "object",
+        "title": "CustomerSecret",
+        "additionalProperties": false,
+        "properties": {
+          "secret": {
+            "type": "string",
+            "description": "Unique identifier for the secret.",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp of the create date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format."
+          },
+          "expireAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp at which the customer secret expires, in [ISO 8601]((https://en.wikipedia.org/wiki/ISO_8601) UTC format."
+          }
+        },
+        "example": {
+          "secret": "cs_qNkU6yob0vOMxUlb2oynUw",
+          "createdAt": "2022-10-31T10:15:00Z",
+          "expireAt": "2022-10-31T10:30:22Z"
+        }
+      },
+      "CardDetails": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pan": {
+            "type": "string",
+            "description": "The masked pan number of the card saved by the customer.",
+            "nullable": true
+          },
+          "expiryDate": {
+            "type": "string",
+            "description": "The expiry date of the card saved by the customer.",
+            "nullable": true
+          },
+          "scheme": {
+            "$ref": "#/components/schemas/CardScheme"
+          }
+        }
+      },
+      "CustomerPaymentMethod": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier of the customer saved payment method.",
+            "nullable": true
+          },
+          "cardDetails": {
+            "nullable": true,
+            "description": "The card details saved by the customer.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CardDetails"
+              }
+            ]
+          }
+        }
+      },
+      "CustomerPaymentMethods": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "Unique identifier of the customer.",
+            "nullable": true
+          },
+          "merchantId": {
+            "type": "string",
+            "description": "Unique identifier of the merchant.",
+            "nullable": true
+          },
+          "savedPaymentMethods": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/CustomerPaymentMethod"
+            },
+            "description": "List of the customer saved payment methods."
+          },
+          "supportedPaymentMethods": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SupportedPaymentMethods"
+              }
+            ],
+            "description": "Supported payment methods."
+          }
+        },
+        "example": {
+          "customerId": "cust_qNkU6yob0vOMxUlb2oy123",
+          "merchantId": "123456789",
+          "savedPaymentMethods": [
+            {
+              "id": "pm_12345",
+              "cardDetails": {
+                "pan": "52000000****0056",
+                "expiryDate": "2024-12-31",
+                "scheme": "MASTERCARD"
+              }
+            }
+          ],
+          "supportedPaymentMethods": {
+            "cardSchemes": [
+              "VISA",
+              "MASTERCARD",
+              "MAESTRO",
+              "AMEX"
+            ],
+            "wallets": [
+              "APPLE_PAY",
+              "GOOGLE_PAY"
+            ]
+          }
+        }
+      },
+      "PagedResultOfCustomer": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "$ref": "#/components/schemas/CustomerFull"
+            },
+            "description": "An array of customers."
+          },
+          "before": {
+            "type": "string",
+            "nullable": true,
+            "example": "IjIwMjItMDYtMjJUMTQ6MTc6MjYuMDkyWiI=",
+            "description": "A cursor for use in pagination for the previous page."
+          },
+          "after": {
+            "type": "string",
+            "nullable": true,
+            "example": "IjIwMjItMDYtMjBUMTM6MzI6MjIuNDM1WiI=",
+            "description": "A cursor for use in pagination for the next page."
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.dojo.tech"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Payment intents",
+      "description": "Allows you to take and manage payments.\n\n**Documentation**: [Payment intents](../docs/manage-payments/payment-intent)"
+    },
+    {
+      "name": "Refunds",
+      "description": "Allows you to manage a refund for payments.\n\n**Documentation**: [Refunds](../docs/manage-payments/cancellation-payments/refund/)"
+    },
+    {
+      "name": "Reversal",
+      "description": "Allows you to create a reversal for payments.\n\n**Documentation**: [Reversal](../docs/manage-payments/cancellation-payments/reversal/)"
+    },
+    {
+      "name": "Captures",
+      "description": "Allows you to capture the full payment amount or part of the amount.\n\n**Documentation**: [Captures](../docs/manage-payments/capture/)"
+    },
+    {
+      "name": "Webhooks",
+      "description": "Webhooks notify you when a specific event has occurred. \n\n**Documentation**: [Webhooks](../docs/development-resources/webhooks/)"
+    },
+    {
+      "name": "Customers",
+      "description": "Allows to create and manage a customer of your business."
+    }
+  ],
+  "x-tagGroup": [
+    {
+      "name": "Payments",
+      "tags": [
+        "Payment intents",
+        "Refunds",
+        "Reversal",
+        "Captures"
+      ]
+    },
+    {
+      "name": "Notifications",
+      "tags": [
+        "Webhooks"
+      ]
+    },
+    {
+      "name": "Customers",
+      "tags": [
+        "Customers"
+      ]
+    }
+  ],
+  "paths": {
+    "/payment-intents": {
+      "post": {
+        "tags": [
+          "Payment intents"
+        ],
+        "summary": "Create a payment intent",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "description": "Creates a payment intent.",
+        "operationId": "PaymentIntents_CreatePaymentIntent",
+        "requestBody": {
+          "x-name": "createPaymentIntentRequest",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentIntentRequest",
+                "examples": {}
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                },
+                "example": {
+                  "id": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw",
+                  "captureMode\"": "Auto",
+                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
+                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
+                  "status": "Created",
+                  "paymentMethods": [
+                    "Card"
+                  ],
+                  "amount": {
+                    "value": 1000,
+                    "currencyCode\"": "GBP"
+                  },
+                  "totalAmount": {
+                    "value": 1000,
+                    "currencyCode": "GBP"
+                  },
+                  "createdAt": "2022-02-21T14:39:21.6050276Z",
+                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
+                  "reference": "Order 234",
+                  "description": "Demo payment intent",
+                  "itemLines": [],
+                  "taxLines": [],
+                  "metadata": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment-intents/{paymentIntentId}": {
+      "get": {
+        "tags": [
+          "Payment intents"
+        ],
+        "operationId": "PaymentIntents_Get",
+        "parameters": [
+          {
+            "name": "paymentIntentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the payment intent.\n",
+            "x-position": 1,
+            "example": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw"
+          },
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                },
+                "example": {
+                  "id": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw",
+                  "captureMode\"": "Auto",
+                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
+                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
+                  "status": "Created",
+                  "paymentMethods": [
+                    "Card"
+                  ],
+                  "amount": {
+                    "value": 1000,
+                    "currencyCode\"": "GBP"
+                  },
+                  "totalAmount": {
+                    "value": 1000,
+                    "currencyCode": "GBP"
+                  },
+                  "createdAt": "2022-02-21T14:39:21.6050276Z",
+                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
+                  "reference": "Order 234",
+                  "description": "Demo payment intent",
+                  "itemLines": [],
+                  "taxLines": [],
+                  "metadata": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "description": "Retrieves the details of a payment intent.",
+        "summary": "Retrieve a payment intent"
+      },
+      "delete": {
+        "tags": [
+          "Payment intents"
+        ],
+        "operationId": "PaymentIntents_Delete",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "paymentIntentId",
+            "description": "Unique identifier for the payment intent.\n",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "example": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                },
+                "example": {
+                  "id": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw",
+                  "captureMode\"": "Auto",
+                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
+                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
+                  "status": "Canceled",
+                  "paymentMethods": [
+                    "Card"
+                  ],
+                  "amount": {
+                    "value": 1000,
+                    "currencyCode\"": "GBP"
+                  },
+                  "totalAmount": {
+                    "value": 1000,
+                    "currencyCode": "GBP"
+                  },
+                  "createdAt": "2022-02-21T14:39:21.6050276Z",
+                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
+                  "reference": "Order 234",
+                  "description": "Demo payment intent",
+                  "itemLines": [],
+                  "taxLines": [],
+                  "metadata": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Cancel a payment intent",
+        "description": "Cancels a payment intent. The payment intent can be canceled if it's in the `Created` status. After cancellation, the payment intent will change the status to `Canceled` and any operations on the payment intent will fail with an error."
+      }
+    },
+    "/payment-intents/{paymentIntentId}/captures": {
+      "post": {
+        "tags": [
+          "Captures"
+        ],
+        "summary": "Captures a payment",
+        "description": "Captures a payment intent that has previously been created but not yet refunded or reversed. You can capture the full amount or a partial amount.",
+        "operationId": "Captures_Create",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "paymentIntentId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier for the payment intent.\n",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "example": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw"
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCaptureRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capture"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment-intents/{paymentIntentId}/refresh-client-session-secret": {
+      "post": {
+        "tags": [
+          "Payment intents"
+        ],
+        "operationId": "PaymentIntents_RefreshClientSessionSecret",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "paymentIntentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier for the payment intent.\n",
+            "x-position": 1,
+            "example": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                },
+                "example": {
+                  "id": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw",
+                  "captureMode\"": "Auto",
+                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
+                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
+                  "status": "Created",
+                  "paymentMethods": [
+                    "Card"
+                  ],
+                  "amount": {
+                    "value": 1000,
+                    "currencyCode\"": "GBP"
+                  },
+                  "totalAmount": {
+                    "value": 1000,
+                    "currencyCode": "GBP"
+                  },
+                  "createdAt": "2022-02-21T14:39:21.6050276Z",
+                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
+                  "reference": "Order 234",
+                  "description": "Demo payment intent",
+                  "itemLines": [],
+                  "taxLines": [],
+                  "metadata": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update a client session secret",
+        "description": "Updates a client session secret."
+      }
+    },
+    "/payment-intents/search": {
+      "post": {
+        "tags": [
+          "Payment intents"
+        ],
+        "operationId": "PaymentIntents_Search",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchPaymentIntentRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedPaymentIntent"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "summary": "List all payment intents",
+        "description": "Retrieves a list of payment intents.\nResults are paginated, by default the method returns up to 50 payment intents."
+      }
+    },
+    "/payment-intents/{paymentIntentId}/tips-amount": {
+      "post": {
+        "tags": [
+          "Payment intents"
+        ],
+        "operationId": "PaymentIntents_SetTipsAmount",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "paymentIntentId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier for the payment intent.\n",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "example": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw"
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetTipsAmountRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                },
+                "example": {
+                  "id": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw",
+                  "captureMode\"": "Auto",
+                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
+                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
+                  "status": "Created",
+                  "paymentMethods": [
+                    "Card"
+                  ],
+                  "amount": {
+                    "value": 1000,
+                    "currencyCode\"": "GBP"
+                  },
+                  "totalAmount": {
+                    "value": 1000,
+                    "currencyCode": "GBP"
+                  },
+                  "createdAt": "2022-02-21T14:39:21.6050276Z",
+                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
+                  "reference": "Order 234",
+                  "description": "Demo payment intent",
+                  "itemLines": [],
+                  "taxLines": [],
+                  "metadata": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Change tips amount",
+        "description": "Changes tips amount for a payment intent. Available if you allowed tips when creating this payment intent."
+      }
+    },
+    "/payment-intents/{paymentIntentId}/amount": {
+      "post": {
+        "tags": [
+          "Payment intents"
+        ],
+        "operationId": "PaymentIntents_SetCustomAmount",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "paymentIntentId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier for the payment intent.\n",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "example": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw"
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAmountRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentIntent"
+                },
+                "example": {
+                  "id": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw",
+                  "captureMode\"": "Auto",
+                  "clientSessionSecret": "lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==",
+                  "clientSessionSecretExpirationDate": "2022-02-21T15:09:21Z",
+                  "status": "Created",
+                  "paymentMethods": [
+                    "Card"
+                  ],
+                  "amount": {
+                    "value": 1000,
+                    "currencyCode\"": "GBP"
+                  },
+                  "totalAmount": {
+                    "value": 1000,
+                    "currencyCode": "GBP"
+                  },
+                  "createdAt": "2022-02-21T14:39:21.6050276Z",
+                  "updatedAt": "2022-02-21T14:39:21.6050277Z",
+                  "reference": "Order 234",
+                  "description": "Demo payment intent",
+                  "itemLines": [],
+                  "taxLines": [],
+                  "metadata": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Change a payment intent amount",
+        "description": "Changes the amount for a payment intent. Available if you allowed the amount changes when creating this payment intent."
+      }
+    },
+    "/payment-intents/{paymentIntentId}/receipt": {
+      "post": {
+        "tags": [
+          "Payment intents"
+        ],
+        "summary": "Send a receipt",
+        "description": "Sends a receipt to the email addresses you specified.",
+        "operationId": "Receipt_Create",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "paymentIntentId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier for the payment intent.\n",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "example": "pi_sandbox_RBMHTJ4fIkmSppDILZVCGw"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Payment receipt requested successfully."
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEmailReceiptRequest"
+              }
+            }
+          },
+          "description": ""
+        }
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "paymentIntentId",
+          "in": "path",
+          "required": true
+        }
+      ]
+    },
+    "/payment-intents/{paymentIntentId}/refunds": {
+      "post": {
+        "tags": [
+          "Refunds"
+        ],
+        "summary": "Create a refund",
+        "description": "Creates a refund. Refund allows you to return a payment that has previously been created but not yet refunded. You can refund the full amount or a partial amount.",
+        "operationId": "Refunds_Create",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "paymentIntentId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier for the payment intent.\n",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "idempotencyKey",
+            "x-originalName": "idempotencyKey",
+            "in": "header",
+            "required": true,
+            "description": " An idempotency key to recognize subsequent retries of the same request. How you generate the idempotency key is up to you. Must be unique for each new refund for the payment intent.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "createRefundRequest",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRefundRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3,
+          "description": ""
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refund"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payment-intents/refunds/{refundId}": {
+      "get": {
+        "tags": [
+          "Refunds"
+        ],
+        "operationId": "PaymentIntents_GetRefundById",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "refundId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier for the refund.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Refund"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "description": "Retrieves the details of a refund that has previously been created.",
+        "summary": "Retrieve a refund"
+      }
+    },
+    "/payment-intents/{paymentIntentId}/reversal": {
+      "post": {
+        "tags": [
+          "Reversal"
+        ],
+        "summary": "Create a reversal",
+        "description": "Reverses a payment intent.",
+        "operationId": "Reversal_Create",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "paymentIntentId",
+            "in": "path",
+            "required": true,
+            "description": "Unique identifier for the payment intent.\n",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reversal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/events": {
+      "get": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "Webhooks_GetAllWebhooks",
+        "summary": "List all events",
+        "description": "Retrieves a list of all events.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WebhookViewModel"
+                  }
+                },
+                "example": [
+                  {
+                    "model": "PaymentIntent",
+                    "events": [
+                      "payment_intent.created",
+                      "payment_intent.updated"
+                    ]
+                  },
+                  {
+                    "model": "Payment",
+                    "events": [
+                      "payment.successful"
+                    ]
+                  },
+                  {
+                    "model": "Order",
+                    "events": [
+                      "order.created"
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks": {
+      "get": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "Webhooks_GetAlSubscriptions",
+        "summary": "List all subscriptions",
+        "description": "Retrieves a list of all subscriptions.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Subscription",
+                    "example": {
+                      "id": "ws_aNkU6yob0vOMxUlghg2oynUw",
+                      "accountId": 12345,
+                      "events": [
+                        "payment_intent.created",
+                        "payment_intent.status_updated"
+                      ],
+                      "url": "https://example.com.com/incoming-events",
+                      "description": "Demo webhooks",
+                      "secrets": [
+                        {
+                          "id": "sc_qNkU6yob0vOMxUlb2oynUw",
+                          "value": "U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ",
+                          "createdAt": "2021-12-13T14:15:01",
+                          "lastUsedAt": "2021-12-16T13:44:03.3242202Z",
+                          "isActive": true
+                        }
+                      ],
+                      "createdAt": "2022-03-30T12:21:04.143Z",
+                      "updatedAt": "2022-03-30T12:21:04.143Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "Webhooks_Subscribe",
+        "summary": "Subscribe to an event",
+        "description": "Creates a new subscription.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                },
+                "example": {
+                  "id": "ws_aNkU6yob0vOMxUlghg2oynUw",
+                  "accountId": 12345,
+                  "events": [
+                    "payment_intent.created",
+                    "payment_intent.status_updated"
+                  ],
+                  "url": "https://example.com.com/incoming-events",
+                  "description": "Demo webhooks",
+                  "secrets": [
+                    {
+                      "id": "sc_qNkU6yob0vOMxUlb2oynUw",
+                      "value": "U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ",
+                      "createdAt": "2021-12-13T14:15:01",
+                      "lastUsedAt": "2021-12-16T13:44:03.3242202Z",
+                      "isActive": true
+                    }
+                  ],
+                  "createdAt": "2022-03-30T12:21:04.143Z",
+                  "updatedAt": "2022-03-30T12:21:04.143Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/{subscriptionId}/secrets": {
+      "get": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "Webhooks_GetSecrets",
+        "summary": "List all secrets",
+        "description": "Retrieves a list of all secrets.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "description": "Unique identifier for the subscription."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretsResponse"
+                },
+                "example": {
+                  "id": "ws_lgQzejyXb0SD8oIDE2zcqA",
+                  "secrets": [
+                    {
+                      "id": "sc_qNkU6yob0vOMxUlb2oynUw",
+                      "value": "U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ",
+                      "createdAt": "2021-12-13T14:15:01",
+                      "lastUsedAt": "2021-12-16T13:44:03.3656144Z",
+                      "isActive": true
+                    },
+                    {
+                      "id": "sc_zNkU6yob0vOMxUlb2oynUw",
+                      "value": "FGswesdsaXB0aW9uUmVzcG9wbGVQcm92aWRlcjxTdWJ",
+                      "createdAt": "2020-12-13T14:15:01",
+                      "lastUsedAt": "2021-12-02T13:58:03.3656159Z",
+                      "isActive": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "Webhooks_GenerateSecret",
+        "summary": "Generate a secret",
+        "description": "Generates a new secret.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "description": "Unique identifier for the subscription."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretsResponse"
+                },
+                "example": {
+                  "secrets": [
+                    {
+                      "id": "sc_qNkU6yob0vOMxUlb2oynUw",
+                      "value": "U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ",
+                      "createdAt": "2021-12-13T14:15:01",
+                      "lastUsedAt": "2021-12-16T13:44:03.3683851Z",
+                      "isActive": true
+                    },
+                    {
+                      "id": "sc_zNkU6yob0vOMxUlb2oynUw",
+                      "value": "FGswesdsaXB0aW9uUmVzcG9wbGVQcm92aWRlcjxTdWJ",
+                      "createdAt": "2020-12-13T14:15:01",
+                      "lastUsedAt": "2021-12-02T13:58:03.3683861Z",
+                      "isActive": false
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/{subscriptionId}/secrets/{secretId}/activate": {
+      "put": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "Webhooks_ActivateSecret",
+        "summary": "Activate a secret",
+        "description": "Activates a secret.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "description": "Unique identifier for the subscription."
+          },
+          {
+            "name": "secretId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2,
+            "description": "Unique identifier for the secret."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/{subscriptionId}/secrets/{secretId}": {
+      "delete": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "Webhooks_DeleteSecret",
+        "summary": "Delete a secret",
+        "description": "Deletes a secret.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "description": "Unique identifier for the subscription."
+          },
+          {
+            "name": "secretId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2,
+            "description": "Unique identifier for the secret."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/{subscriptionId}": {
+      "patch": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "Webhooks_SubscribeUpdate",
+        "summary": "Update a subscription",
+        "description": "Updates you subscription details. You can change the URL or the list of events.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "description": "Unique identifier for the subscription."
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscriptionUpdateRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Subscription"
+                },
+                "example": {
+                  "id": "ws_aNkU6yob0vOMxUlghg2oynUw",
+                  "accountId": 12345,
+                  "events": [
+                    "payment_intent.created",
+                    "payment_intent.status_updated"
+                  ],
+                  "url": "https://example.com.com/incoming-events",
+                  "description": "Demo webhooks",
+                  "secrets": [
+                    {
+                      "id": "sc_qNkU6yob0vOMxUlb2oynUw",
+                      "value": "U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ",
+                      "createdAt": "2021-12-13T14:15:01",
+                      "lastUsedAt": "2021-12-16T13:44:03.3242202Z",
+                      "isActive": true
+                    }
+                  ],
+                  "createdAt": "2022-03-30T12:21:04.143Z",
+                  "updatedAt": "2022-03-30T12:21:04.143Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Webhooks"
+        ],
+        "operationId": "Webhooks_DeleteSubscriptions",
+        "summary": "Delete a subscription",
+        "description": "Deletes a subscription.",
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1,
+            "description": "Unique identifier for the subscription."
+          },
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_Create",
+        "summary": "Create a customer",
+        "description": "Creates a new customer.",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "requestBody": {
+          "x-name": "obj",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCustomerRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerFull"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers/{customerId}": {
+      "delete": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_Delete",
+        "summary": "Delete a customer",
+        "description": "Deletes a customer.",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2,
+            "example": "cust_qNkU6yob0vOMxUlb2oynUw",
+            "description": "Unique identifier of the customer."
+          },
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_Update",
+        "summary": "Update information about a customer",
+        "description": "Updates information about a customer.",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "example": "cs_qNkU6yob0vOMxUlb2oynUw",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unique identifier of the customer.",
+            "x-position": 2
+          },
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "requestBody": {
+          "x-name": "updateData",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCustomerRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerFull"
+                },
+                "example": {
+                  "id": "cs_qNkU6yob0vOMxUlb2oynUw",
+                  "name": "Alex",
+                  "emailAddress": "alex@dojo.com",
+                  "phoneNumber": "078976534161",
+                  "documentVersion": 1,
+                  "createdAt": "2019-08-24T14:15:22Z",
+                  "updatedAt": "2021-07-24T14:15:22Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_SearchAll",
+        "summary": "Retrieve a customer",
+        "description": "Retrieves the details of customers.",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "description": "Unique identifiers for the customers you want to get information about, separated by commas."
+          },
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerFull"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers/{customerId}/create-secret": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_CreateCustomerSecret",
+        "summary": "Create a customer secret",
+        "description": "Creates a unique customer secret key valid within a scope of time. ",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1,
+            "example": "cust_qNkU6yob0vOMxUlb2oynUw",
+            "description": "Unique identifier of the customer."
+          },
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerSecret"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers/public/{customerId}/payment-methods": {
+      "get": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_GetPaymentMethods",
+        "summary": "Retrieve payment method",
+        "description": "Retrieves available payment methods for a customer.",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1,
+            "example": "cust_qNkU6yob0vOMxUlb2oynUw",
+            "description": "Unique identifier of the customer."
+          },
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2,
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3,
+            "example": "Authorization: Basic cs_generated-customer-secret",
+            "description": "Basic HTTP authentication to grant access to customer owned resources.\n\n- The required customer secret key is short lived and will expire after pre-configured set of time.\n\n- The customer secret can be generated by calling [POST /customers/{customerId}/create-secret](https://docs.dojo.tech/api#operation/Customers_CreateCustomerSecret)\n"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomerPaymentMethods"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers/public/{customerId}/payment-methods/{paymentMethodId}": {
+      "delete": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_DeletePaymentMethod",
+        "summary": "Remove payment method",
+        "description": "Delete a customer payment method.\n",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 1,
+            "example": "cust_qNkU6yob0vOMxUlb2oynUw",
+            "description": "Unique identifier of the customer."
+          },
+          {
+            "name": "paymentMethodId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 2,
+            "example": "pm_otRL98WURbaAKs0sdy7_5w",
+            "description": "Unique identifier of the customer payment method."
+          },
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 3,
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "x-position": 4,
+            "example": "Authorization: Basic cs_generated-customer-secret",
+            "description": "Basic HTTP authentication to grant access to customer owned resources.\n\n- The required customer secret key is short lived and will expire after pre-configured set of time.\n\n- The customer secret can be generated by calling [POST /customers/{customerId}/create-secret](https://docs.dojo.tech/api#operation/Customers_CreateCustomerSecret)\n"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers/search": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "operationId": "Customers_Search",
+        "summary": "List all customers",
+        "description": "Retrieves a list of all customers.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "The maximum number of results to be returned in a single page."
+          },
+          {
+            "name": "before",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "description": "A cursor for use in pagination for the previous page. `before` and `after` are mutually exclusive—only one of these may be used."
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            },
+            "description": "A cursor for use in pagination for the next page. `before` and `after` are mutually exclusive—only one of these may be used."
+          },
+          {
+            "name": "version",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2022-04-07",
+            "description": "API version with format yyyy-mm-dd. Current version is 2022–04–07. Today's date will always give you the latest version. "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfCustomer"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
