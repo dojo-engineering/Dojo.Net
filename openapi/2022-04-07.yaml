@@ -546,12 +546,14 @@ components:
           description: The link to the payment's associated actions.
         autoExpireAction:
           $ref: '#/components/schemas/AutoExpireAction'
+          nullable: true
         autoExpireAt:
           type: string
           format: date-time
           description: |-
             The timestamp of the date when this payment intent will be captured or reversed, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
             Only available and required if `captureMode: Manual`.
+          nullable: true
         metadata:
           type: object
           additionalProperties:
@@ -715,9 +717,9 @@ components:
           description: The total amount after applying discounts and taxes.
         refundedAmount:
           nullable: true
-          oneOf:
-            - $ref: '#/components/schemas/Money'
-          description: The amount that was [refunded](https://docs.dojo.tech/docs/manage-payments/cancellation-payments/refund).
+          type: integer
+          description: The amount that was refunded.
+          format: int64
         customer:
           nullable: true
           oneOf:
