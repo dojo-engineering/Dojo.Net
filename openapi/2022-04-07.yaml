@@ -1,0 +1,3168 @@
+x-generator: NSwag v13.12.1.0 (NJsonSchema v10.4.6.0 (Newtonsoft.Json v12.0.0.0))
+openapi: 3.0.0
+info:
+  title: Payment Service
+  version: '2022-04-07'
+  description: |-
+    # Introduction
+
+    The Dojo API is RESTful. It returns HTTP response codes to indicate errors. It also
+    accepts and returns JSON in the HTTP body.
+
+    ## Base URLs
+
+    Use the following base URL when making requests to the API:  https://api.dojo.tech/
+
+    ## Looking for no-code solutions?
+
+    Try one of our [pre-built solutions](../docs/plugins/) for your site.
+
+    ## Authentication
+
+    The Dojo API uses [Basic HTTP auth](https://en.wikipedia.org/wiki/Basic_access_authentication). You can generate API keys in [Developer Portal](https://developer.dojo.tech).
+    Secret keys for the test environment have the prefix `sk_sandbox_` and for production have the prefix `sk_prod_`.
+
+    You must include your secret API key in the header of all requests, for example:
+
+    ```curl
+    curl
+      --header 'content-type: application/json' \
+      --header 'Authorization: Basic sk_prod_your_key' \
+    ...
+    ```
+
+    API requests without authentication will fail.
+
+    ## HTTP Responses
+
+    The API returns standard HTTP response codes [RFC 7231](https://tools.ietf.org/html/rfc7231#section-6) on each request to indicate the success or otherwise of API requests. HTTP status codes summary are listed below:
+
+    * `200 OK`—The request was successful.
+
+    * `201 Created`—The request was successful, and a new resource was created as a result.
+
+    * `204 No Content`—The request was successful, but there is no content to send.
+
+    * `400 Bad Request`—Bad request, probably due to a syntax error.
+
+    * `401 Unauthorized`—Authentication required.
+
+    * `403 Forbidden`—The API key doesn't have permissions.
+
+    * `404 Not Found`—The resource doesn't exist.
+
+    * `405 Method Not Allowed`—The request method is known by the server but isn't supported by the target resource.
+
+    * `409 Conflict`—The request couldn't be completed because it conflicted with another request or the server's configuration.
+
+    * `500`, `502`, `503`, `504` `Server Errors`—An error occurred with our API.
+
+    ## Errors
+
+    Dojo follows the error response format proposed in [RFC 7807](https://tools.ietf.org/html/rfc7807) also known as Problem Details for HTTP APIs. All errors are returned in the form of JSON.
+
+    ### Error Schema
+
+    In case of an error, the response object contains the following fields:
+
+    * `errors` [object]—A human-readable explanation of errors.
+
+    * `type` [string]—
+    A URI reference RFC 3986 that identifies the problem type.
+
+    * `title` [string]—A short, human-readable summary of the error.
+
+    * `status` [integer]—The HTTP status code.
+
+    * `detail` [string]—A human-readable message giving more details about the error. Not always present.
+
+    * `traceId` [string]—The unique identifier of the failing request.
+
+    The following example shows a possible error response:
+
+    ```json
+    {
+        "errors": {
+            "Reference": [
+                "The Reference field is required."
+            ]
+        },
+        "type": "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+        "title": "One or more validation errors occurred.",
+        "status": 400,
+        "traceId": "00-a405f077df056a498323ffbcec05923f-aa63e6f4dbbc734a-01",
+    }
+    ```
+
+    ## Versioning
+
+    Dojo API uses the yyyy-mm-dd API version-naming scheme. You have to pass the version as the `version` header in all API calls, for example:
+
+    ``` curl
+    curl
+      --header 'content-type: application/json' \
+      --header 'Authorization: Basic sk_prod_your_key' \
+      --header 'version: 2022-04-07' \
+    ```
+
+    When we make [breaking changes](../docs/development-resources/versioning-overview#breaking-changes) to the API, we release new dated versions.
+
+    The current version is `2022-04-07`.
+
+    ## Postman collection
+
+    You can run the API collection in Postman:
+
+     [![Run in Postman](https://run.pstmn.io/button.svg)](https://god.gw.postman.com/run-collection/16735701-b218f555-a7ad-46c4-8ad8-1f11c0aee443?action=collection%2Ffork&collection-url=entityId%3D16735701-b218f555-a7ad-46c4-8ad8-1f11c0aee443%26entityType%3Dcollection%26workspaceId%3Dfdd152df-0154-428c-aeb4-1b90e46b8523)
+  termsOfService: https://dojo.tech/legal/
+  contact:
+    name: Dojo Developer Experience Team
+security:
+  - ApiKeyAuth: []
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      in: header
+      type: apiKey
+      name: Authorization
+  schemas:
+    CaptureMode:
+      type: string
+      title: CaptureMode
+      x-enumNames:
+        - Auto
+        - Manual
+      enum:
+        - Auto
+        - Manual
+      description: ''
+      default: Auto
+    Money:
+      title: Money
+      type: object
+      example:
+        value: 1000
+        currencyCode: GBP
+      properties:
+        value:
+          type: integer
+          description: The amount in the minor unit, for example "100" for 1.00 GBP.
+          format: int64
+        currencyCode:
+          type: string
+          description: Three-letter currency code in [ISO 4217 alpha-3](https://en.wikipedia.org/wiki/ISO_4217) format.
+          minLength: 1
+      required:
+        - value
+        - currencyCode
+    Customer:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          nullable: true
+          description: Unique identifier of the customer.
+        emailAddress:
+          type: string
+          description: The customer's email address.
+          nullable: true
+        phoneNumber:
+          type: string
+          description: The customer's phone number.
+          nullable: true
+      description: Details about the customer.
+      title: Customer
+      example:
+        emailAddress: support@dojo.com
+        phoneNumber: '+448000443550'
+    Address:
+      type: object
+      additionalProperties: false
+      example:
+        address1: The Brunel Building
+        address2: 2 Canalside Walk
+        city: London
+        postcode: W2 1DG
+        countryCode: GB
+        county: UK
+      description: Details about the address.
+      properties:
+        address1:
+          type: string
+          description: Address line 1 (for example, company name).
+          nullable: true
+        address2:
+          type: string
+          description: Address line 2 (for example, street, apartment, or suite).
+          nullable: true
+        address3:
+          type: string
+          description: Address line 3.
+          nullable: true
+        address4:
+          type: string
+          description: Address line 4.
+          nullable: true
+        city:
+          type: string
+          description: City, town, district, suburb, or village.
+          example: London
+          nullable: true
+        state:
+          type: string
+          description: State, province, or region.
+          nullable: true
+        postcode:
+          type: string
+          description: ZIP or postal code.
+          nullable: true
+        countryCode:
+          type: string
+          description: ' Two-letter country code in [ISO 3166–1-alpha-2 format](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2).'
+          example: GB
+          nullable: true
+        locality:
+          type: string
+          description: Locality, can use in addition to city.
+          nullable: true
+        county:
+          type: string
+          description: County or zone.
+          nullable: true
+      title: Address
+    ShippingDetails:
+      type: object
+      title: ShippingDetails
+      additionalProperties: false
+      description: Details about the shipping.
+      properties:
+        name:
+          type: string
+          description: The name of the customer.
+          nullable: true
+        deliveryNotes:
+          type: string
+          description: The delivery notes.
+          nullable: true
+        address:
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: Details about the address.
+    PaymentIntentConfigCustomerEmail:
+      type: object
+      additionalProperties: false
+      title: PaymentIntentConfigCustomerEmail
+      description: ''
+      properties:
+        collectionRequired:
+          type: boolean
+          description: If has the value `true` the object will be collected.
+          default: false
+    PaymentIntentConfigDetails:
+      type: object
+      additionalProperties: false
+      properties:
+        showTotal:
+          type: boolean
+          description: If has the value `true`, the total order amount will be showed.
+        showReference:
+          type: boolean
+          description: If has the value `true`, the order reference id will be showed.
+    PaymentIntentConfigBillingAddress:
+      type: object
+      title: PaymentIntentConfigBillingAddress
+      additionalProperties: false
+      properties:
+        collectionRequired:
+          type: boolean
+          description: If has the value `true` the object will be collected.
+    PaymentIntentConfigShippingDetails:
+      type: object
+      title: PaymentIntentConfigShippingDetails
+      additionalProperties: false
+      properties:
+        collectionRequired:
+          type: boolean
+          description: If has the value `true` the object will be collected.
+    PaymentConfigDetails:
+      type: object
+      additionalProperties: false
+      title: PaymentConfigDetails
+      properties:
+        customAmountAllowed:
+          type: boolean
+          description: If has the value `true` the amount of the payment intent can be changed.
+        tipsAllowed:
+          type: boolean
+          description: If has the value `true` tips are allowed.
+    PaymentIntentConfig:
+      type: object
+      additionalProperties: false
+      description: Details about the payment intent configurations.
+      title: PaymentIntentConfig
+      properties:
+        title:
+          type: string
+          description: The [checkout page’s title](docs/accept-payments/checkout-page/configuration#add-information-about-your-company).
+          nullable: true
+        redirectUrl:
+          type: string
+          format: uri
+          description: The URL where the customer will be directed to after the payment.
+          nullable: true
+        cancelUrl:
+          type: string
+          format: uri
+          description: The URL where the customer will be directed to when canceling the payment.
+          nullable: true
+        customerEmail:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentIntentConfigCustomerEmail'
+          description: Configuration of the client's email address.
+        details:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentIntentConfigDetails'
+          description: |
+            The following configuration details of the payment intent. See [detailed information about the order and taxes](docs/accept-payments/checkout-page/configuration#show-detailed-information-about-the-order-and-taxes).
+
+            - The total order amount including tax.
+            - The order reference id.
+        billingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentIntentConfigBillingAddress'
+          description: Configuration of the billing address.
+        shippingDetails:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentIntentConfigShippingDetails'
+          description: ' Configuration of the shipping details.'
+        payment:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentConfigDetails'
+          description: Configuration of the payment.
+    RequestSecurity:
+      type: object
+      additionalProperties: false
+      title: RequestSecurity
+      description: Customer's device information.
+      properties:
+        userAgent:
+          type: string
+          description: The customer's browser agent.
+          nullable: true
+        ipAddress:
+          type: string
+          description: The customer's device IP address.
+          nullable: true
+        device:
+          type: string
+          description: The customer's device type.
+          nullable: true
+      example:
+        userAgent: null
+        ipAddress: null
+        device: null
+    ItemLine:
+      type: object
+      title: ItemLine
+      additionalProperties: false
+      description: The item line object.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the object.
+          nullable: true
+        quantity:
+          type: integer
+          format: int32
+          description: The quantity of items being purchased.
+        caption:
+          type: string
+          description: A name of the item.
+          nullable: true
+        amountTotal:
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: The total amount before applying discounts and taxes.
+    TaxLine:
+      type: object
+      title: TaxLine
+      additionalProperties: false
+      description: The tax line object.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the object.
+          nullable: true
+        caption:
+          type: string
+          description: A name of the tax.
+          nullable: true
+        subCaption:
+          type: string
+          description: A subname of the tax.
+          nullable: true
+        amountTotal:
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: Total amount of taxes.
+    PaymentMethod:
+      type: string
+      description: The payment methods that customers can use to pay.
+      enum:
+        - Card
+        - Wallet
+    ActionType:
+      type: string
+      title: ActionType
+      x-enumNames:
+        - OpenLink
+        - DownloadFile
+      description: The type of action associated with the link.
+      enum:
+        - DownloadFile
+        - OpenLink
+      default: OpenLink
+    ActionLink:
+      type: object
+      title: ActionLink
+      additionalProperties: false
+      description: The link to the payment's associated actions.
+      properties:
+        url:
+          type: string
+          format: uri
+          minLength: 1
+          description: The link URL.
+        action:
+          $ref: '#/components/schemas/ActionType'
+        label:
+          type: string
+          minLength: 1
+          description: Custom label given to the action.
+        fileName:
+          type: string
+          description: Filename of the document.
+          nullable: true
+      required:
+        - url
+        - label
+      example:
+        url: https://docs.dojo.tech/docs/getting-started
+        label: docs-link
+    AutoExpireAction:
+      type: string
+      description: |
+        The action that happens with this payment intent after the date set in the `autoExpireAt` parameter.
+        Only available and required if `captureMode: Manual`.
+      x-enumNames:
+        - Release
+        - Capture
+      enum:
+        - Release
+        - Capture
+    CreatePaymentIntentRequest:
+      type: object
+      description: The payment intent request object.
+      additionalProperties: false
+      title: CreatePaymentIntentRequest
+      properties:
+        captureMode:
+          description: |-
+            The type of capture for the payment:
+
+            - `Auto`—(Default) payments are captured automatically after authorization
+
+            - `Manual`—payments are captured by making a request [POST /payment-intents/{paymentIntentId}/captures](https://docs.dojo.tech/api#operation/Captures_Create)
+          oneOf:
+            - $ref: '#/components/schemas/CaptureMode'
+        amount:
+          description: The amount intended to be collected by this payment intent.
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+        tipsAmount:
+          description: The tips amount.
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+        reference:
+          type: string
+          minLength: 1
+          description: Details of the reference for the payment.
+        description:
+          type: string
+          description: The payment description.
+          nullable: true
+        customer:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Customer'
+          description: Details about the customer.
+        billingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the invoice.
+        shippingDetails:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/ShippingDetails'
+          description: The address where to send the order.
+        config:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentIntentConfig'
+          description: Details about the payment intent configuration.
+        requestSecurity:
+          oneOf:
+            - $ref: '#/components/schemas/RequestSecurity'
+          description: Customer's device information.
+        itemLines:
+          type: array
+          description: The line items purchased by the customer.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ItemLine'
+        taxLines:
+          type: array
+          description: The taxes applied to the items.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/TaxLine'
+        paymentMethods:
+          type: array
+          description: The payment methods that customers can use to pay.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/PaymentMethod'
+        actionLink:
+          oneOf:
+            - $ref: '#/components/schemas/ActionLink'
+          description: The link to the payment's associated actions.
+        autoExpireAction:
+          $ref: '#/components/schemas/AutoExpireAction'
+        autoExpireAt:
+          type: string
+          format: date-time
+          description: |-
+            The timestamp of the date when this payment intent will be captured or reversed, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+            Only available and required if `captureMode: Manual`.
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: A set of key-value pairs that you can use for storing additional information.
+          nullable: true
+      required:
+        - amount
+        - reference
+      example:
+        amount:
+          value: 1000
+          currencyCode: GBP
+        reference: Order 234
+        description: Demo payment intent
+    PaymentDetails:
+      type: object
+      additionalProperties: false
+      description: The payment details object.
+      title: PaymentDetails
+      properties:
+        transactionDateTime:
+          type: string
+          description: The date and time of the payment in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+          nullable: true
+        message:
+          type: string
+          description: The description of the operation.
+          nullable: true
+        authCode:
+          type: string
+          description: The acquirer authorization code.
+          nullable: true
+        cardNumber:
+          type: string
+          description: The card number.
+          nullable: true
+        cardName:
+          type: string
+          description: The name of the cardholder.
+          nullable: true
+        expiryDate:
+          type: string
+          description: 'The expiry month and year. Format: MM/YY.'
+          nullable: true
+        cardType:
+          type: string
+          description: The card scheme.
+          nullable: true
+    PaymentIntentStatus:
+      type: string
+      description: Current status of the payment intent.
+      title: PaymentIntentStatus
+      enum:
+        - Created
+        - Authorized
+        - Captured
+        - Reversed
+        - Refunded
+        - Canceled
+    CardScheme:
+      type: string
+      description: Supported card schemes.
+      x-enumNames:
+        - VISA
+        - MASTERCARD
+        - MAESTRO
+        - AMEX
+      enum:
+        - VISA
+        - MASTERCARD
+        - MAESTRO
+        - AMEX
+    Wallet:
+      type: string
+      description: Wallet payment options.
+      x-enumNames:
+        - APPLE_PAY
+        - GOOGLE_PAY
+      enum:
+        - APPLE_PAY
+        - GOOGLE_PAY
+    SupportedPaymentMethods:
+      type: object
+      additionalProperties: false
+      properties:
+        cardSchemes:
+          type: array
+          nullable: true
+          description: Supported card schemes.
+          items:
+            $ref: '#/components/schemas/CardScheme'
+        wallets:
+          type: array
+          nullable: true
+          description: List of supported payment wallets.
+          items:
+            $ref: '#/components/schemas/Wallet'
+    MerchantConfig:
+      type: object
+      additionalProperties: false
+      description: Details about the merchant configuration.
+      title: MerchantConfig
+      properties:
+        supportedPaymentMethods:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/SupportedPaymentMethods'
+          description: Supported payment methods.
+    PaymentIntent:
+      type: object
+      additionalProperties: false
+      description: The PaymentIntent object.
+      title: PaymentIntent
+      properties:
+        id:
+          type: string
+          description: |
+            Unique identifier for the payment intent.
+          nullable: true
+        captureMode:
+          $ref: '#/components/schemas/CaptureMode'
+        clientSessionSecret:
+          type: string
+          description: The client secret.
+          nullable: true
+        clientSessionSecretExpirationDate:
+          type: string
+          description: The expiration date of `clientSessionSecret`.
+        paymentDetails:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentDetails'
+          description: Details about the payment.
+        status:
+          $ref: '#/components/schemas/PaymentIntentStatus'
+        paymentMethods:
+          type: array
+          description: The payment methods that customers can use to pay.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/PaymentMethod'
+        amount:
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: The amount intended to be collected by this payment intent.
+        tipsAmount:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: The tips amount.
+        requestedAmount:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: The amount that was requested by this Payment intent.
+        totalAmount:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: The total amount after applying discounts and taxes.
+        refundedAmount:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: The amount that was [refunded](https://docs.dojo.tech/docs/manage-payments/cancellation-payments/refund).
+        customer:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Customer'
+          description: Details about the customer.
+        requestSecurity:
+          oneOf:
+            - $ref: '#/components/schemas/RequestSecurity'
+          description: Customer's device information.
+        billingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the invoice.
+        shippingDetails:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/ShippingDetails'
+          description: The address where to send the order.
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of the create date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the update date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+        reference:
+          type: string
+          description: Details of the reference for the payment.
+          nullable: true
+        description:
+          type: string
+          description: The payment description.
+          nullable: true
+        subtotalLineItems:
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: The total amount after applying discounts and taxes.
+        itemLines:
+          type: array
+          description: The line items purchased by the customer.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ItemLine'
+        taxLines:
+          type: array
+          description: The taxes applied to the items.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/TaxLine'
+        actionLink:
+          oneOf:
+            - $ref: '#/components/schemas/ActionLink'
+          description: The link to the payment's associated actions.
+        config:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentIntentConfig'
+          description: Details about the payment intent configuration.
+        merchantConfig:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/MerchantConfig'
+          description: Details of payment intent merchant configuration.
+        autoExpireAction:
+          $ref: '#/components/schemas/AutoExpireAction'
+        expireAt:
+          type: string
+          format: date-time
+          description: |-
+            The timestamp of the date when this payment intent will be captured or reversed, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+            Only available and required if `captureMode: Manual`.
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: A set of key-value pairs that you can use for storing additional information.
+          nullable: true
+    ProblemDetails:
+      type: object
+      title: ProblemDetails
+      description: ''
+      properties:
+        type:
+          type: string
+          description: A URI reference [RFC 3986](https://datatracker.ietf.org/doc/html/rfc3986) that identifies the problem type.
+        title:
+          type: string
+          description: A short, human-readable summary of the error.
+        status:
+          type: integer
+          format: int32
+          description: The [HTTP status code](#section/HTTP-Responses).
+        detail:
+          type: string
+          nullable: true
+          description: A human-readable message giving more details about the error. Not always present.
+        traceId:
+          type: string
+          description: The unique identifier of the failing request.
+        errors:
+          type: object
+          description: A human-readable explanation of errors.
+          additionalProperties: {}
+    CreateCaptureRequest:
+      type: object
+      description: The capture request object.
+      additionalProperties: false
+      title: CreateCaptureRequest
+      properties:
+        amount:
+          type: integer
+          description: The amount to capture. You can capture the full amount or a partial amount.
+          format: int64
+      required:
+        - amount
+      example:
+        amount: 1000
+    Capture:
+      type: object
+      description: The capture response object.
+      additionalProperties: false
+      title: Capture
+      properties:
+        message:
+          type: string
+          description: The description of the operation.
+          nullable: true
+        captureId:
+          type: string
+          description: Unique identifier for the capture.
+          nullable: true
+      example:
+        message: Demo capture
+        captureId: cp_itIiJMEAvES3ynYF_Yhs2g
+    Cursor:
+      type: object
+      additionalProperties: false
+      description: 'A cursor for use in pagination. '
+      properties:
+        limit:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 20
+          default: 50
+          description: The maximum number of results to be returned in a single page.
+        before:
+          type: string
+          description: A cursor for use in pagination for the previous page. `before` and `after` are mutually exclusive—only one of these may be used.
+          nullable: true
+        after:
+          type: string
+          description: A cursor for use in pagination for the next page. `before` and `after` are mutually exclusive—only one of these may be used.
+          nullable: true
+    SearchPaymentIntentRequest:
+      type: object
+      additionalProperties: false
+      description: ''
+      properties:
+        statuses:
+          type: array
+          description: Statuses of payment intents.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/PaymentIntentStatus'
+        startDate:
+          type: string
+          format: date-time
+          description: Date and time from which to search, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+          nullable: true
+        endDate:
+          type: string
+          format: date-time
+          description: Date and time until which to search in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+          nullable: true
+        cursor:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Cursor'
+          description: 'A cursor for use in pagination. '
+      example:
+        statuses:
+          - Created
+        startDate: '2019-08-24T14:15:22Z'
+        endDate: '2023-08-24T14:15:22Z'
+        cursor:
+          limit: 20
+    PagedResultOfPaymentIntent:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          nullable: true
+          description: An array of payment intents.
+          items:
+            $ref: '#/components/schemas/PaymentIntent'
+        before:
+          type: string
+          description: A cursor for use in pagination for the previous page.
+          nullable: true
+        after:
+          type: string
+          description: A cursor for use in pagination for the next page.
+          nullable: true
+    PagedPaymentIntent:
+      allOf:
+        - $ref: '#/components/schemas/PagedResultOfPaymentIntent'
+        - type: object
+          additionalProperties: false
+    SetTipsAmountRequest:
+      description: The tips amount.
+      type: object
+      properties:
+        tipsAmount:
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: The tips amount.
+      required:
+        - tipsAmount
+      example:
+        tipsAmount:
+          value: 500
+          currencyCode: GBP
+    SetAmountRequest:
+      type: object
+      additionalProperties: false
+      description: ''
+      properties:
+        amount:
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+          description: The amount intended to be collected by this payment intent.
+      required:
+        - amount
+      example:
+        amount:
+          value: 1000
+          currencyCode: GBP
+    SendEmailReceiptRequest:
+      title: SendEmailReceiptRequest
+      type: object
+      properties:
+        emails:
+          type: array
+          description: The list of email addresses to which the receipt should be sent.
+          items:
+            type: string
+      required:
+        - emails
+      description: ''
+      example:
+        emails:
+          - gabriel@dojo.com
+          - mari@dojo.com
+    CreateRefundRequest:
+      type: object
+      description: The create refund request object.
+      example:
+        amount: 1000
+        refundReason: Demo refund
+      additionalProperties: false
+      title: CreateRefundRequest
+      properties:
+        amount:
+          type: integer
+          description: The refund amount.
+          format: int64
+        refundReason:
+          type: string
+          description: The reason for the refund.
+          nullable: true
+        notes:
+          type: string
+          description: The description of the refund.
+          nullable: true
+      required:
+        - amount
+    Refund:
+      type: object
+      additionalProperties: false
+      properties:
+        paymentIntentId:
+          type: string
+          description: |
+            Unique identifier for the payment intent.
+          nullable: true
+        refundId:
+          type: string
+          description: Unique identifier for the refund.
+          nullable: true
+        refundReason:
+          type: string
+          description: The reason for the refund.
+          nullable: true
+        notes:
+          type: string
+          description: The description of the refund.
+          nullable: true
+      description: The refund response object.
+      title: Refund
+      example:
+        paymentIntentId: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+        refundId: rfnd_127usj
+        refundReason: Demo refund
+        notes: null
+    Reversal:
+      type: object
+      description: The create reversal response object.
+      additionalProperties: false
+      title: Reversal
+      properties:
+        message:
+          type: string
+          description: The description of the operation.
+          nullable: true
+        reversalId:
+          type: string
+          description: Unique identifier for the reversal.
+          nullable: true
+      example:
+        message: null
+        reversalId: rvs_127usj
+    WebhookViewModel:
+      type: object
+      additionalProperties: false
+      properties:
+        model:
+          type: string
+          description: The webhook type.
+        events:
+          type: array
+          description: The list of events.
+          items:
+            type: string
+    SubscriptionSecret:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the secret.
+        value:
+          type: string
+          description: The secret value.
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of the created date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+        isActive:
+          type: boolean
+          description: The status of the secret. It can be activated or deactivated.
+    Subscription:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the subscription.
+        accountId:
+          type: string
+          nullable: true
+          description: Unique identifier for the account.
+        events:
+          type: array
+          description: The list of events.
+          items:
+            type: string
+        url:
+          type: string
+          description: The URL of your webhook endpoint.
+          format: uri
+          minLength: 1
+          pattern: ^https://*.+
+        description:
+          type: string
+          description: The subscription description.
+        secrets:
+          type: array
+          description: The list of subscription’s secrets, used to generate signatures.
+          items:
+            $ref: '#/components/schemas/SubscriptionSecret'
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of the create date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the update date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+    SubscriptionRequest:
+      type: object
+      example:
+        events:
+          - payment_intent.created
+          - payment.successful
+          - order.created
+        url: https://example.com/incoming-events
+      additionalProperties: false
+      required:
+        - events
+        - url
+      properties:
+        events:
+          type: array
+          description: The list of events.
+          items:
+            type: string
+        url:
+          type: string
+          format: uri
+          minLength: 1
+          pattern: ^https://*.+
+          description: The URL of your webhook endpoint.
+        description:
+          type: string
+          description: The subscription description.
+    SecretsResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the subscription.
+        secrets:
+          type: array
+          description: The list of subscription’s secrets, used to generate signatures.
+          items:
+            $ref: '#/components/schemas/SubscriptionSecret'
+    SubscriptionUpdateRequest:
+      type: object
+      example:
+        events:
+          - payment_intent.created
+          - order.created
+      additionalProperties: false
+      properties:
+        events:
+          type: array
+          description: The list of events.
+          items:
+            type: string
+        url:
+          type: string
+          description: The URL of your webhook endpoint.
+          format: uri
+          pattern: ^https://*.+
+        description:
+          type: string
+          description: The subscription description.
+    CreateCustomerRequest:
+      type: object
+      additionalProperties: false
+      example:
+        name: Alex
+        emailAddress: alex@dojo.com
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: The customer's name.
+        shippingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the order.
+        billingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the invoice.
+        emailAddress:
+          type: string
+          description: The customer's email address.
+          nullable: true
+        phoneNumber:
+          type: string
+          description: The customer's phone number.
+          nullable: true
+        vatNumber:
+          type: string
+          nullable: true
+          description: The VAT number of the customer.
+    CustomerFull:
+      type: object
+      additionalProperties: false
+      example:
+        id: cs_qNkU6yob0vOMxUlb2oynUw
+        name: Alex
+        emailAddress: alex@dojo.com
+        documentVersion: 0
+        createdAt: '2019-08-24T14:15:22Z'
+      properties:
+        id:
+          type: string
+          nullable: true
+          description: Unique identifier of the customer.
+        name:
+          type: string
+          nullable: true
+          description: The customer's name.
+        shippingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the order.
+        billingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the invoice.
+        emailAddress:
+          type: string
+          description: The customer's email address.
+          nullable: true
+        phoneNumber:
+          type: string
+          description: The customer's phone number.
+          nullable: true
+        vatNumber:
+          type: string
+          nullable: true
+          description: The VAT number of the customer.
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The timestamp of the create date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: The timestamp of the update date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+        documentVersion:
+          type: integer
+          format: int32
+          description: The version of the customer's data, updated with every change.
+    UpdateCustomerRequest:
+      type: object
+      additionalProperties: false
+      example:
+        phoneNumber: '078976534161'
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: The customer's name.
+        billingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the invoice.
+        shippingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the order.
+        emailAddress:
+          type: string
+          nullable: true
+          description: The customer's email address.
+        phoneNumber:
+          type: string
+          nullable: true
+          description: The customer's phone number.
+        vatNumber:
+          type: string
+          nullable: true
+          description: The VAT number of the customer.
+    CustomerSecret:
+      type: object
+      title: CustomerSecret
+      additionalProperties: false
+      properties:
+        secret:
+          type: string
+          description: Unique identifier for the secret.
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of the create date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+        expireAt:
+          type: string
+          format: date-time
+          description: The timestamp at which the customer secret expires, in [ISO 8601]((https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+      example:
+        secret: cs_qNkU6yob0vOMxUlb2oynUw
+        createdAt: '2022-10-31T10:15:00Z'
+        expireAt: '2022-10-31T10:30:22Z'
+    CardDetails:
+      type: object
+      additionalProperties: false
+      properties:
+        pan:
+          type: string
+          description: The masked pan number of the card saved by the customer.
+          nullable: true
+        expiryDate:
+          type: string
+          description: The expiry date of the card saved by the customer.
+          nullable: true
+        scheme:
+          $ref: '#/components/schemas/CardScheme'
+    CustomerPaymentMethod:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the customer saved payment method.
+          nullable: true
+        cardDetails:
+          nullable: true
+          description: The card details saved by the customer.
+          oneOf:
+            - $ref: '#/components/schemas/CardDetails'
+    CustomerPaymentMethods:
+      type: object
+      additionalProperties: false
+      properties:
+        customerId:
+          type: string
+          description: Unique identifier of the customer.
+          nullable: true
+        merchantId:
+          type: string
+          description: Unique identifier of the merchant.
+          nullable: true
+        savedPaymentMethods:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/CustomerPaymentMethod'
+          description: List of the customer saved payment methods.
+        supportedPaymentMethods:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/SupportedPaymentMethods'
+          description: Supported payment methods.
+      example:
+        customerId: cust_qNkU6yob0vOMxUlb2oy123
+        merchantId: '123456789'
+        savedPaymentMethods:
+          - id: pm_12345
+            cardDetails:
+              pan: 52000000****0056
+              expiryDate: '2024-12-31'
+              scheme: MASTERCARD
+        supportedPaymentMethods:
+          cardSchemes:
+            - VISA
+            - MASTERCARD
+            - MAESTRO
+            - AMEX
+          wallets:
+            - APPLE_PAY
+            - GOOGLE_PAY
+    SearchCustomerRequest:
+      type: object
+      additionalProperties: false
+      description: 'A cursor for use in pagination. '
+      properties:
+        limit:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 20
+          default: 50
+          description: The maximum number of results to be returned in a single page.
+        before:
+          type: string
+          description: A cursor for use in pagination for the previous page. `before` and `after` are mutually exclusive—only one of these may be used.
+          nullable: true
+        after:
+          type: string
+          description: A cursor for use in pagination for the next page. `before` and `after` are mutually exclusive—only one of these may be used.
+          nullable: true
+    PagedResultOfCustomer:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/CustomerFull'
+          description: An array of customers.
+        before:
+          type: string
+          nullable: true
+          example: IjIwMjItMDYtMjJUMTQ6MTc6MjYuMDkyWiI=
+          description: A cursor for use in pagination for the previous page.
+        after:
+          type: string
+          nullable: true
+          example: IjIwMjItMDYtMjBUMTM6MzI6MjIuNDM1WiI=
+          description: A cursor for use in pagination for the next page.
+servers:
+  - url: https://api.dojo.tech
+tags:
+  - name: Payment intents
+    description: |-
+      Allows you to take and manage payments.
+
+      **Documentation**: [Payment intents](../docs/manage-payments/payment-intent)
+  - name: Refunds
+    description: |-
+      Allows you to manage a refund for payments.
+
+      **Documentation**: [Refunds](../docs/manage-payments/cancellation-payments/refund/)
+  - name: Reversal
+    description: |-
+      Allows you to create a reversal for payments.
+
+      **Documentation**: [Reversal](../docs/manage-payments/cancellation-payments/reversal/)
+  - name: Captures
+    description: |-
+      Allows you to capture the full payment amount or part of the amount.
+
+      **Documentation**: [Captures](../docs/manage-payments/capture/)
+  - name: Webhooks
+    description: |-
+      Webhooks notify you when a specific event has occurred. 
+
+      **Documentation**: [Webhooks](../docs/development-resources/webhooks/)
+  - name: Customers
+    description: Allows to create and manage a customer of your business.
+x-tagGroup:
+  - name: Payments
+    tags:
+      - Payment intents
+      - Refunds
+      - Reversal
+      - Captures
+  - name: Notifications
+    tags:
+      - Webhooks
+  - name: Customers
+    tags:
+      - Customers
+paths:
+  /payment-intents:
+    post:
+      tags:
+        - Payment intents
+      summary: Create a payment intent
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      description: Creates a payment intent.
+      operationId: PaymentIntents_CreatePaymentIntent
+      requestBody:
+        x-name: createPaymentIntentRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentIntentRequest'
+              examples: {}
+        required: true
+        x-position: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntent'
+              example:
+                id: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+                captureMode": Auto
+                clientSessionSecret: lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==
+                clientSessionSecretExpirationDate: '2022-02-21T15:09:21Z'
+                status: Created
+                paymentMethods:
+                  - Card
+                amount:
+                  value: 1000
+                  currencyCode": GBP
+                totalAmount:
+                  value: 1000
+                  currencyCode: GBP
+                createdAt: '2022-02-21T14:39:21.6050276Z'
+                updatedAt: '2022-02-21T14:39:21.6050277Z'
+                reference: Order 234
+                description: Demo payment intent
+                itemLines: []
+                taxLines: []
+                metadata: {}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /payment-intents/{paymentIntentId}:
+    get:
+      tags:
+        - Payment intents
+      operationId: PaymentIntents_Get
+      parameters:
+        - name: paymentIntentId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: |
+            Unique identifier for the payment intent.
+          x-position: 1
+          example: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntent'
+              example:
+                id: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+                captureMode": Auto
+                clientSessionSecret: lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==
+                clientSessionSecretExpirationDate: '2022-02-21T15:09:21Z'
+                status: Created
+                paymentMethods:
+                  - Card
+                amount:
+                  value: 1000
+                  currencyCode": GBP
+                totalAmount:
+                  value: 1000
+                  currencyCode: GBP
+                createdAt: '2022-02-21T14:39:21.6050276Z'
+                updatedAt: '2022-02-21T14:39:21.6050277Z'
+                reference: Order 234
+                description: Demo payment intent
+                itemLines: []
+                taxLines: []
+                metadata: {}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      description: Retrieves the details of a payment intent.
+      summary: Retrieve a payment intent
+    delete:
+      tags:
+        - Payment intents
+      operationId: PaymentIntents_Delete
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: paymentIntentId
+          description: |
+            Unique identifier for the payment intent.
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 1
+          example: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntent'
+              example:
+                id: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+                captureMode": Auto
+                clientSessionSecret: lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==
+                clientSessionSecretExpirationDate: '2022-02-21T15:09:21Z'
+                status: Canceled
+                paymentMethods:
+                  - Card
+                amount:
+                  value: 1000
+                  currencyCode": GBP
+                totalAmount:
+                  value: 1000
+                  currencyCode: GBP
+                createdAt: '2022-02-21T14:39:21.6050276Z'
+                updatedAt: '2022-02-21T14:39:21.6050277Z'
+                reference: Order 234
+                description: Demo payment intent
+                itemLines: []
+                taxLines: []
+                metadata: {}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      summary: Cancel a payment intent
+      description: Cancels a payment intent. The payment intent can be canceled if it's in the `Created` status. After cancellation, the payment intent will change the status to `Canceled` and any operations on the payment intent will fail with an error.
+  /payment-intents/{paymentIntentId}/captures:
+    post:
+      tags:
+        - Captures
+      summary: Captures a payment
+      description: Captures a payment intent that has previously been created but not yet refunded or reversed. You can capture the full amount or a partial amount.
+      operationId: Captures_Create
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: paymentIntentId
+          in: path
+          required: true
+          description: |
+            Unique identifier for the payment intent.
+          schema:
+            type: string
+          x-position: 1
+          example: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+      requestBody:
+        x-name: request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCaptureRequest'
+        required: true
+        x-position: 2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Capture'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /payment-intents/{paymentIntentId}/refresh-client-session-secret:
+    post:
+      tags:
+        - Payment intents
+      operationId: PaymentIntents_RefreshClientSessionSecret
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: paymentIntentId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: |
+            Unique identifier for the payment intent.
+          x-position: 1
+          example: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntent'
+              example:
+                id: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+                captureMode": Auto
+                clientSessionSecret: lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==
+                clientSessionSecretExpirationDate: '2022-02-21T15:09:21Z'
+                status: Created
+                paymentMethods:
+                  - Card
+                amount:
+                  value: 1000
+                  currencyCode": GBP
+                totalAmount:
+                  value: 1000
+                  currencyCode: GBP
+                createdAt: '2022-02-21T14:39:21.6050276Z'
+                updatedAt: '2022-02-21T14:39:21.6050277Z'
+                reference: Order 234
+                description: Demo payment intent
+                itemLines: []
+                taxLines: []
+                metadata: {}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      summary: Update a client session secret
+      description: Updates a client session secret.
+  /payment-intents/search:
+    post:
+      tags:
+        - Payment intents
+      operationId: PaymentIntents_Search
+      requestBody:
+        x-name: request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchPaymentIntentRequest'
+        required: true
+        x-position: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedPaymentIntent'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      summary: List all payment intents
+      description: |-
+        Retrieves a list of payment intents.
+        Results are paginated, by default the method returns up to 50 payment intents.
+  /payment-intents/{paymentIntentId}/tips-amount:
+    post:
+      tags:
+        - Payment intents
+      operationId: PaymentIntents_SetTipsAmount
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: paymentIntentId
+          in: path
+          required: true
+          description: |
+            Unique identifier for the payment intent.
+          schema:
+            type: string
+          x-position: 1
+          example: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+      requestBody:
+        x-name: request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetTipsAmountRequest'
+        required: true
+        x-position: 2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntent'
+              example:
+                id: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+                captureMode": Auto
+                clientSessionSecret: lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==
+                clientSessionSecretExpirationDate: '2022-02-21T15:09:21Z'
+                status: Created
+                paymentMethods:
+                  - Card
+                amount:
+                  value: 1000
+                  currencyCode": GBP
+                totalAmount:
+                  value: 1000
+                  currencyCode: GBP
+                createdAt: '2022-02-21T14:39:21.6050276Z'
+                updatedAt: '2022-02-21T14:39:21.6050277Z'
+                reference: Order 234
+                description: Demo payment intent
+                itemLines: []
+                taxLines: []
+                metadata: {}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '405':
+          description: Method not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      summary: Change tips amount
+      description: Changes tips amount for a payment intent. Available if you allowed tips when creating this payment intent.
+  /payment-intents/{paymentIntentId}/amount:
+    post:
+      tags:
+        - Payment intents
+      operationId: PaymentIntents_SetCustomAmount
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: paymentIntentId
+          in: path
+          required: true
+          description: |
+            Unique identifier for the payment intent.
+          schema:
+            type: string
+          x-position: 1
+          example: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+      requestBody:
+        x-name: request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SetAmountRequest'
+        required: true
+        x-position: 2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntent'
+              example:
+                id: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+                captureMode": Auto
+                clientSessionSecret: lmoFsbTJxoiOBgeWkEoFS05ADIQ6STJfJE3oGVNO2cFSb9kza06wGan2DVNceOYCsmZ5I1SiEioFausOAkecUPz8BKSmMV96ecXZZ4-NzoiYZJF0uVYeW8xosG6blQKtZ6HqIIF8--2a7DC_iQ==
+                clientSessionSecretExpirationDate: '2022-02-21T15:09:21Z'
+                status: Created
+                paymentMethods:
+                  - Card
+                amount:
+                  value: 1000
+                  currencyCode": GBP
+                totalAmount:
+                  value: 1000
+                  currencyCode: GBP
+                createdAt: '2022-02-21T14:39:21.6050276Z'
+                updatedAt: '2022-02-21T14:39:21.6050277Z'
+                reference: Order 234
+                description: Demo payment intent
+                itemLines: []
+                taxLines: []
+                metadata: {}
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '405':
+          description: Method not allowed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      summary: Change a payment intent amount
+      description: Changes the amount for a payment intent. Available if you allowed the amount changes when creating this payment intent.
+  /payment-intents/{paymentIntentId}/receipt:
+    post:
+      tags:
+        - Payment intents
+      summary: Send a receipt
+      description: Sends a receipt to the email addresses you specified.
+      operationId: Receipt_Create
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: paymentIntentId
+          in: path
+          required: true
+          description: |
+            Unique identifier for the payment intent.
+          schema:
+            type: string
+          x-position: 1
+          example: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+      responses:
+        '204':
+          description: Payment receipt requested successfully.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailReceiptRequest'
+        description: ''
+    parameters:
+      - schema:
+          type: string
+        name: paymentIntentId
+        in: path
+        required: true
+  /payment-intents/{paymentIntentId}/refunds:
+    post:
+      tags:
+        - Refunds
+      summary: Create a refund
+      description: Creates a refund. Refund allows you to return a payment that has previously been created but not yet refunded. You can refund the full amount or a partial amount.
+      operationId: Refunds_Create
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: paymentIntentId
+          in: path
+          required: true
+          description: |
+            Unique identifier for the payment intent.
+          schema:
+            type: string
+          x-position: 1
+        - name: idempotencyKey
+          x-originalName: idempotencyKey
+          in: header
+          required: true
+          description: ' An idempotency key to recognize subsequent retries of the same request. How you generate the idempotency key is up to you. Must be unique for each new refund for the payment intent.'
+          schema:
+            type: string
+          x-position: 2
+      requestBody:
+        x-name: createRefundRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRefundRequest'
+        required: true
+        x-position: 3
+        description: ''
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /payment-intents/refunds/{refundId}:
+    get:
+      tags:
+        - Refunds
+      operationId: PaymentIntents_GetRefundById
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: refundId
+          in: path
+          required: true
+          description: Unique identifier for the refund.
+          schema:
+            type: string
+          x-position: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Refund'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      description: Retrieves the details of a refund that has previously been created.
+      summary: Retrieve a refund
+  /payment-intents/{paymentIntentId}/reversal:
+    post:
+      tags:
+        - Reversal
+      summary: Create a reversal
+      description: Reverses a payment intent.
+      operationId: Reversal_Create
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: paymentIntentId
+          in: path
+          required: true
+          description: |
+            Unique identifier for the payment intent.
+          schema:
+            type: string
+          x-position: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reversal'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /webhooks/events:
+    get:
+      tags:
+        - Webhooks
+      operationId: Webhooks_GetAllWebhooks
+      summary: List all events
+      description: Retrieves a list of all events.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WebhookViewModel'
+              example:
+                - model: PaymentIntent
+                  events:
+                    - payment_intent.created
+                    - payment_intent.updated
+                - model: Payment
+                  events:
+                    - payment.successful
+                - model: Order
+                  events:
+                    - order.created
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /webhooks:
+    get:
+      tags:
+        - Webhooks
+      operationId: Webhooks_GetAlSubscriptions
+      summary: List all subscriptions
+      description: Retrieves a list of all subscriptions.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+                  example:
+                    id: ws_aNkU6yob0vOMxUlghg2oynUw
+                    accountId: 12345
+                    events:
+                      - payment_intent.created
+                      - payment_intent.status_updated
+                    url: https://example.com.com/incoming-events
+                    description: Demo webhooks
+                    secrets:
+                      - id: sc_qNkU6yob0vOMxUlb2oynUw
+                        value: U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ
+                        createdAt: '2021-12-13T14:15:01'
+                        lastUsedAt: '2021-12-16T13:44:03.3242202Z'
+                        isActive: true
+                    createdAt: '2022-03-30T12:21:04.143Z'
+                    updatedAt: '2022-03-30T12:21:04.143Z'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    post:
+      tags:
+        - Webhooks
+      operationId: Webhooks_Subscribe
+      summary: Subscribe to an event
+      description: Creates a new subscription.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      requestBody:
+        x-name: request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionRequest'
+        required: true
+        x-position: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+              example:
+                id: ws_aNkU6yob0vOMxUlghg2oynUw
+                accountId: 12345
+                events:
+                  - payment_intent.created
+                  - payment_intent.status_updated
+                url: https://example.com.com/incoming-events
+                description: Demo webhooks
+                secrets:
+                  - id: sc_qNkU6yob0vOMxUlb2oynUw
+                    value: U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ
+                    createdAt: '2021-12-13T14:15:01'
+                    lastUsedAt: '2021-12-16T13:44:03.3242202Z'
+                    isActive: true
+                createdAt: '2022-03-30T12:21:04.143Z'
+                updatedAt: '2022-03-30T12:21:04.143Z'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /webhooks/{subscriptionId}/secrets:
+    get:
+      tags:
+        - Webhooks
+      operationId: Webhooks_GetSecrets
+      summary: List all secrets
+      description: Retrieves a list of all secrets.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 1
+          description: Unique identifier for the subscription.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretsResponse'
+              example:
+                id: ws_lgQzejyXb0SD8oIDE2zcqA
+                secrets:
+                  - id: sc_qNkU6yob0vOMxUlb2oynUw
+                    value: U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ
+                    createdAt: '2021-12-13T14:15:01'
+                    lastUsedAt: '2021-12-16T13:44:03.3656144Z'
+                    isActive: true
+                  - id: sc_zNkU6yob0vOMxUlb2oynUw
+                    value: FGswesdsaXB0aW9uUmVzcG9wbGVQcm92aWRlcjxTdWJ
+                    createdAt: '2020-12-13T14:15:01'
+                    lastUsedAt: '2021-12-02T13:58:03.3656159Z'
+                    isActive: false
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    post:
+      tags:
+        - Webhooks
+      operationId: Webhooks_GenerateSecret
+      summary: Generate a secret
+      description: Generates a new secret.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 1
+          description: Unique identifier for the subscription.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretsResponse'
+              example:
+                secrets:
+                  - id: sc_qNkU6yob0vOMxUlb2oynUw
+                    value: U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ
+                    createdAt: '2021-12-13T14:15:01'
+                    lastUsedAt: '2021-12-16T13:44:03.3683851Z'
+                    isActive: true
+                  - id: sc_zNkU6yob0vOMxUlb2oynUw
+                    value: FGswesdsaXB0aW9uUmVzcG9wbGVQcm92aWRlcjxTdWJ
+                    createdAt: '2020-12-13T14:15:01'
+                    lastUsedAt: '2021-12-02T13:58:03.3683861Z'
+                    isActive: false
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /webhooks/{subscriptionId}/secrets/{secretId}/activate:
+    put:
+      tags:
+        - Webhooks
+      operationId: Webhooks_ActivateSecret
+      summary: Activate a secret
+      description: Activates a secret.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 1
+          description: Unique identifier for the subscription.
+        - name: secretId
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 2
+          description: Unique identifier for the secret.
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /webhooks/{subscriptionId}/secrets/{secretId}:
+    delete:
+      tags:
+        - Webhooks
+      operationId: Webhooks_DeleteSecret
+      summary: Delete a secret
+      description: Deletes a secret.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 1
+          description: Unique identifier for the subscription.
+        - name: secretId
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 2
+          description: Unique identifier for the secret.
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /webhooks/{subscriptionId}:
+    patch:
+      tags:
+        - Webhooks
+      operationId: Webhooks_SubscribeUpdate
+      summary: Update a subscription
+      description: Updates you subscription details. You can change the URL or the list of events.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 1
+          description: Unique identifier for the subscription.
+      requestBody:
+        x-name: request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionUpdateRequest'
+        required: true
+        x-position: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+              example:
+                id: ws_aNkU6yob0vOMxUlghg2oynUw
+                accountId: 12345
+                events:
+                  - payment_intent.created
+                  - payment_intent.status_updated
+                url: https://example.com.com/incoming-events
+                description: Demo webhooks
+                secrets:
+                  - id: sc_qNkU6yob0vOMxUlb2oynUw
+                    value: U3Vic2NyaXB0aW9uUmVzcG9uc2VFeGFtcGxlIDogSUV4YW1wbGVQcm92aWRlcjxTdWJ
+                    createdAt: '2021-12-13T14:15:01'
+                    lastUsedAt: '2021-12-16T13:44:03.3242202Z'
+                    isActive: true
+                createdAt: '2022-03-30T12:21:04.143Z'
+                updatedAt: '2022-03-30T12:21:04.143Z'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    delete:
+      tags:
+        - Webhooks
+      operationId: Webhooks_DeleteSubscriptions
+      summary: Delete a subscription
+      description: Deletes a subscription.
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 1
+          description: Unique identifier for the subscription.
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /customers:
+    post:
+      tags:
+        - Customers
+      operationId: Customers_Create
+      summary: Create a customer
+      description: Creates a new customer.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      requestBody:
+        x-name: obj
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRequest'
+        required: true
+        x-position: 2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerFull'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /customers/{customerId}:
+    delete:
+      tags:
+        - Customers
+      operationId: Customers_Delete
+      summary: Delete a customer
+      description: Deletes a customer.
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+          x-position: 2
+          example: cust_qNkU6yob0vOMxUlb2oynUw
+          description: Unique identifier of the customer.
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    patch:
+      tags:
+        - Customers
+      operationId: Customers_Update
+      summary: Update information about a customer
+      description: Updates information about a customer.
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          example: cs_qNkU6yob0vOMxUlb2oynUw
+          schema:
+            type: string
+          description: Unique identifier of the customer.
+          x-position: 2
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      requestBody:
+        x-name: updateData
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerRequest'
+        required: true
+        x-position: 3
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerFull'
+              example:
+                id: cs_qNkU6yob0vOMxUlb2oynUw
+                name: Alex
+                emailAddress: alex@dojo.com
+                phoneNumber: '078976534161'
+                documentVersion: 1
+                createdAt: '2019-08-24T14:15:22Z'
+                updatedAt: '2021-07-24T14:15:22Z'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    get:
+      tags:
+        - Customers
+      operationId: Customers_Get
+      summary: Retrieve a customer
+      description: Retrieves the details of a customer.
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          description: Unique identifiers for the customers you want to get information about, separated by commas.
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerFull'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /customers/{customerId}/create-secret:
+    post:
+      tags:
+        - Customers
+      operationId: Customers_CreateCustomerSecret
+      summary: Create a customer secret
+      description: 'Creates a unique customer secret key valid within a scope of time. '
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          x-position: 1
+          example: cust_qNkU6yob0vOMxUlb2oynUw
+          description: Unique identifier of the customer.
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerSecret'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /customers/public/{customerId}/payment-methods:
+    get:
+      tags:
+        - Customers
+      operationId: Customers_GetPaymentMethods
+      summary: Retrieve payment method
+      description: Retrieves available payment methods for a customer.
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          x-position: 1
+          example: cust_qNkU6yob0vOMxUlb2oynUw
+          description: Unique identifier of the customer.
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            nullable: true
+          x-position: 2
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            nullable: true
+          x-position: 3
+          example: 'Authorization: Basic cs_generated-customer-secret'
+          description: |
+            Basic HTTP authentication to grant access to customer owned resources.
+
+            - The required customer secret key is short lived and will expire after pre-configured set of time.
+
+            - The customer secret can be generated by calling [POST /customers/{customerId}/create-secret](https://docs.dojo.tech/api#operation/Customers_CreateCustomerSecret)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPaymentMethods'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /customers/public/{customerId}/payment-methods/{paymentMethodId}:
+    delete:
+      tags:
+        - Customers
+      operationId: Customers_DeletePaymentMethod
+      summary: Remove payment method
+      description: |
+        Delete a customer payment method.
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          x-position: 1
+          example: cust_qNkU6yob0vOMxUlb2oynUw
+          description: Unique identifier of the customer.
+        - name: paymentMethodId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          x-position: 2
+          example: pm_otRL98WURbaAKs0sdy7_5w
+          description: Unique identifier of the customer payment method.
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            nullable: true
+          x-position: 3
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+        - name: authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            nullable: true
+          x-position: 4
+          example: 'Authorization: Basic cs_generated-customer-secret'
+          description: |
+            Basic HTTP authentication to grant access to customer owned resources.
+
+            - The required customer secret key is short lived and will expire after pre-configured set of time.
+
+            - The customer secret can be generated by calling [POST /customers/{customerId}/create-secret](https://docs.dojo.tech/api#operation/Customers_CreateCustomerSecret)
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /customers/search:
+    post:
+      tags:
+        - Customers
+      operationId: Customers_Search
+      requestBody:
+        x-name: request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchCustomerRequest'
+        required: true
+        x-position: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedResultOfCustomer'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+      summary: List all customers
+      description: |-
+        Retrieves a list of customers.
+        Results are paginated, by default the method returns up to 50 customers.

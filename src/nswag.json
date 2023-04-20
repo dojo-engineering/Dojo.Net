@@ -3,7 +3,7 @@
   "defaultVariables": "CSharpOutputPath=./Dojo.Net",
   "documentGenerator": {
     "fromDocument": {
-      "json": "../openapi/2022-04-07.json"
+      "json": "../openapi/2022-04-07.yaml"
   }
   },
   "codeGenerators": {
