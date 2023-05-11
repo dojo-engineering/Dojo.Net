@@ -24,7 +24,7 @@ jobs:
       uses: NuGet/setup-nuget@v1.0.6
 
     - name: Restore dependencies
-      run: nuget restore $PROJECT
+      run: nuget restore
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
@@ -32,7 +32,7 @@ jobs:
         dotnet-version: 6.0.x
 
     - name: Build
-      run: dotnet build $PROJECT --configuration $BUILD_CONFIG --no-restore
+      run: dotnet build --configuration $BUILD_CONFIG --no-restore
 
     - name: Run tests
-      run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
+      run: dotnet test /p:Configuration=$BUILD_CONFIG --no-restore --no-build --verbosity normal
