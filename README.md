@@ -46,7 +46,7 @@ dotnet build
 
 ## Documentation
 
-For a comprehensive list of examples, check out the [API
+For a comprehensive list of APIs and examples, check out the [API
 documentation][api-docs].
 
 ## Usage
@@ -79,7 +79,7 @@ builder.Services
 For any requests, bug or comments, please [open an issue][issues] or [submit a
 pull request][pulls].
 
-[api-docs]: https://docs.dojo.tech
+[api-docs]: https://docs.dojo.tech/payments/api
 [dotnet-core-cli-tools]: https://docs.microsoft.com/en-us/dotnet/core/tools/
 [issues]: https://github.com/dojo-engineering/Dojo.Net/issues
 [nuget-cli]: https://docs.microsoft.com/en-us/nuget/tools/nuget-exe-cli-reference
