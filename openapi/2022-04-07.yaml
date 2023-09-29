@@ -142,6 +142,8 @@ tags:
       **Documentation**: [Webhooks](../payments/development-resources/webhooks/)
   - name: Customers
     description: Allows to create and manage a customer of your business.
+  - name: Setup intents
+    description: Allows you to setup a card for future payments.
 paths:
   /payment-intents:
     post:
@@ -156,7 +158,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       description: Creates a payment intent.
       operationId: PaymentIntents_CreatePaymentIntent
       requestBody:
@@ -236,7 +238,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       responses:
         '200':
           description: OK
@@ -297,7 +299,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: paymentIntentId
           description: |
             Unique identifier for the payment intent.
@@ -370,7 +372,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: paymentIntentId
           in: path
           required: true
@@ -413,6 +415,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /payment-intents/{paymentIntentId}/charge:
+    post:
+      tags:
+        - Payment intents
+      summary: Charge a card
+      operationId: PaymentIntents_ChargePaymentIntent
+      description: Allows you to charge a card later. This is available for merchant-initiated transactions only.
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+          example: '2022-04-07'
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
+        - name: paymentIntentId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          description: |
+            Unique identifier for the payment intent.
+          x-position: 3
+          example: pi_sandbox_RBMHTJ4fIkmSppDILZVCGw
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargeResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /payment-intents/{paymentIntentId}/refresh-client-session-secret:
     post:
       tags:
@@ -426,7 +479,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: paymentIntentId
           in: path
           required: true
@@ -518,7 +571,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       summary: List all payment intents
       description: |-
         Retrieves a list of payment intents.
@@ -536,7 +589,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: paymentIntentId
           in: path
           required: true
@@ -615,7 +668,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: paymentIntentId
           in: path
           required: true
@@ -696,7 +749,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: paymentIntentId
           in: path
           required: true
@@ -755,7 +808,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: paymentIntentId
           in: path
           required: true
@@ -814,7 +867,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: refundId
           in: path
           required: true
@@ -859,7 +912,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: paymentIntentId
           in: path
           required: true
@@ -893,6 +946,294 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /setup-intents:
+    post:
+      tags:
+        - Setup intents
+      operationId: SetupIntents_Create
+      summary: Create a setup intent
+      parameters:
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+            nullable: false
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
+          x-position: 3
+      description: Creates a setup intent.
+      requestBody:
+        x-name: createSetupIntentRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSetupIntentRequest'
+        required: true
+        x-position: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupIntentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /setup-intents/{setupIntentId}:
+    get:
+      tags:
+        - Setup intents
+      operationId: SetupIntents_GetById
+      summary: Retrieve a setup intent
+      parameters:
+        - name: setupIntentId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          description: Unique identifier for the setup intent.
+          x-position: 3
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+            nullable: false
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
+          x-position: 4
+      description: Get a setup intent by ID.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupIntentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+    delete:
+      tags:
+        - Setup intents
+      summary: Cancel a setup intent
+      operationId: SetupIntents_Delete
+      parameters:
+        - name: setupIntentId
+          in: path
+          required: true
+          schema:
+            type: string
+            maxLength: 50
+            nullable: true
+          description: Unique identifier for the setup intent.
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+            nullable: false
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
+      description: Cancels a setup intent.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupIntentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Internal server error
+  /setup-intents/public/{setupIntentId}:
+    get:
+      tags:
+        - Setup intents
+      operationId: SetupIntents_GetPublicById
+      summary: Retrieve a setup intent (no auth)
+      parameters:
+        - name: setupIntentId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          description: The unique ID of the setup intent.
+          x-position: 1
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+            nullable: false
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
+          x-position: 2
+      description: Get a setup intent by ID
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupIntentPublicResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /setup-intents/{setupIntentId}/refresh-client-session-secret:
+    post:
+      tags:
+        - Setup intents
+      operationId: SetupIntents_RefreshPaymentIntentToken
+      summary: Update a client session secret
+      parameters:
+        - name: setupIntentId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          description: The unique ID of the setup intent.
+          x-position: 1
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+            nullable: false
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
+          x-position: 2
+      description: Updates a client session secret.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupIntentResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /setup-intents/public/{setupIntentId}/refresh-client-session-secret:
+    post:
+      tags:
+        - Setup intents
+      operationId: SetupIntents_RefreshSetupIntentTokenPublic
+      summary: Update a client session secret (no auth)
+      parameters:
+        - name: setupIntentId
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: true
+          description: The unique ID of the setup intent.
+          x-position: 1
+        - name: version
+          in: header
+          required: true
+          schema:
+            type: string
+            format: date
+            nullable: false
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
+          x-position: 2
+      description: Updates a client session secret.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SetupIntentPublicResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /webhooks/events:
     get:
       tags:
@@ -908,7 +1249,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       responses:
         '200':
           description: OK
@@ -956,7 +1297,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       responses:
         '200':
           description: OK
@@ -1008,7 +1349,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       requestBody:
         x-name: request
         content:
@@ -1085,7 +1426,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: subscriptionId
           in: path
           required: true
@@ -1145,7 +1486,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: subscriptionId
           in: path
           required: true
@@ -1211,7 +1552,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: subscriptionId
           in: path
           required: true
@@ -1262,7 +1603,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: subscriptionId
           in: path
           required: true
@@ -1313,7 +1654,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: subscriptionId
           in: path
           required: true
@@ -1403,7 +1744,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       responses:
         '204':
           description: No Content
@@ -1440,7 +1781,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       requestBody:
         x-name: obj
         content:
@@ -1492,7 +1833,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       responses:
         '204':
           description: No Content
@@ -1536,7 +1877,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       requestBody:
         x-name: updateData
         content:
@@ -1599,7 +1940,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       responses:
         '200':
           description: OK
@@ -1646,7 +1987,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       responses:
         '200':
           description: OK
@@ -1698,7 +2039,7 @@ paths:
             format: date
             x-position: 2
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: authorization
           in: header
           required: true
@@ -1776,7 +2117,7 @@ paths:
             format: date
           example: '2022-04-07'
           x-position: 3
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
         - name: authorization
           in: header
           required: true
@@ -1853,7 +2194,7 @@ paths:
             type: string
             format: date
           example: '2022-04-07'
-          description: 'API version with format yyyy-mm-dd. Current version is 2022–04–07. Today''s date will always give you the latest version. '
+          description: 'API version with format yyyy-mm-dd. Current version is 2022-04-07. Today''s date will always give you the latest version. '
       summary: List all customers
       description: |-
         Retrieves a list of customers.
@@ -1874,7 +2215,7 @@ components:
       enum:
         - Auto
         - Manual
-      description: ''
+      description: ' '
       default: Auto
     Money:
       title: Money
@@ -2006,6 +2347,13 @@ components:
           oneOf:
             - $ref: '#/components/schemas/Address'
           description: Details about the address.
+    TransactionSource:
+      type: string
+      title: TransactionSource
+      enum:
+        - MOTO
+      description: Payments initiated through mail, telephone, or internet order. These payments are keyed manually by the merchant using a secure payment page, for example Dojo for Business, or a card machine. No physical cards are present during a MOTO transaction and these transactions don't require authentication of the cardholder using 3DS, or a chip and a pin.
+      example: null
     PaymentIntentConfigCustomerEmail:
       type: object
       additionalProperties: false
@@ -2221,13 +2569,11 @@ components:
         - url
         - label
       example:
-        url: https://docs.dojo.tech/docs/getting-started
+        url: https://docs.dojo.tech/payments/getting-started
         label: docs-link
     AutoExpireAction:
       type: string
-      description: |
-        The action that happens with this payment intent after the date set in the `autoExpireAt` parameter.
-        Only available and required if `captureMode: Manual`.
+      description: ' '
       x-enumNames:
         - Release
         - Capture
@@ -2283,6 +2629,11 @@ components:
           oneOf:
             - $ref: '#/components/schemas/ShippingDetails'
           description: The address where to send the order.
+        transactionSource:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/TransactionSource'
+          description: Information about the transaction source type.
         config:
           nullable: true
           oneOf:
@@ -2316,16 +2667,23 @@ components:
           oneOf:
             - $ref: '#/components/schemas/ActionLink'
           description: The link to the payment's associated actions.
-        autoExpireAction:
-          oneOf:
-            - $ref: '#/components/schemas/AutoExpireAction'
-          nullable: true
-        autoExpireAt:
+        expireAt:
           type: string
           format: date-time
+          description: The timestamp and date of when a payment intent will be voided, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format. This occurs when a payment intent is created and not yet authorized. If `null`, the payment intent is voided after 30 days.
+          nullable: true
+        autoExpireIn:
+          type: string
+          format: timespan
           description: |-
-            The timestamp of the date when this payment intent will be captured or reversed, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
-            Only available and required if `captureMode: Manual`.
+            The time interval after which `paymentIntent: Manual` will be captured or reversed, in `dd.hh:MM:ss` format.
+            The timestamp value must be more than 30 seconds and less than 7 days.
+          nullable: true
+        autoExpireAction:
+          type: string
+          oneOf:
+            - $ref: '#/components/schemas/AutoExpireAction'
+          description: The action that happens with the `Manual` payment intent after the time interval is set in `autoExpireIn` parameter.
           nullable: true
         metadata:
           type: object
@@ -2333,6 +2691,10 @@ components:
             type: string
           description: A set of key-value pairs that you can use for storing additional information.
           nullable: true
+        setupIntentId:
+          type: string
+          nullable: true
+          description: Unique identifier for the setup intent.
       required:
         - amount
         - reference
@@ -2358,7 +2720,7 @@ components:
           nullable: true
         authCode:
           type: string
-          description: The acquirer authorization code.
+          description: The acquirer authorization code. This code is returned on a successful transaction.
           nullable: true
         cardNumber:
           type: string
@@ -2443,11 +2805,15 @@ components:
         - VISA
         - MASTERCARD
         - MAESTRO
+        - DISCOVER
+        - DCI
         - AMEX
       enum:
         - VISA
         - MASTERCARD
         - MAESTRO
+        - DISCOVER
+        - DCI
         - AMEX
     Wallet:
       type: string
@@ -2612,17 +2978,24 @@ components:
           oneOf:
             - $ref: '#/components/schemas/MerchantConfig'
           description: Details of payment intent merchant configuration.
+        expireAt:
+          type: string
+          format: date-time
+          description: The timestamp and date of when a payment intent will be voided, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format. This occurs when a payment intent is created and not yet authorized. If `null`, the payment intent is voided after 30 days.
+          nullable: true
+        autoExpireIn:
+          type: string
+          nullable: true
+          format: timespan
+          description: |-
+            The time interval after which `paymentIntent: Manual` will be captured or reversed, in `dd.hh:MM:ss` format.
+            The timestamp value must be more than 30 seconds and less than 7 days.
         autoExpireAction:
+          type: string
           nullable: true
           oneOf:
             - $ref: '#/components/schemas/AutoExpireAction'
-        autoExpireAt:
-          type: string
-          nullable: true
-          format: date-time
-          description: |-
-            The timestamp of the date when this payment intent will be captured or reversed, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
-            Only available and required if `captureMode: Manual`.
+          description: The action that happens with the `Manual` payment intent after the time interval is set in `autoExpireIn` parameter.
         metadata:
           type: object
           additionalProperties:
@@ -2691,6 +3064,36 @@ components:
       example:
         message: Demo capture
         captureId: cp_itIiJMEAvES3ynYF_Yhs2g
+    CaptureStatus:
+      title: CaptureStatus
+      type: string
+      description: Current capture status.
+      x-enumNames:
+        - Created
+        - Successful
+        - Declined
+        - Failed
+      enum:
+        - Created
+        - Successful
+        - Declined
+        - Failed
+    ChargeResponse:
+      type: object
+      description: The charge response object.
+      additionalProperties: false
+      title: Charge
+      properties:
+        paymentIntentId:
+          type: string
+          description: |
+            Unique identifier for the payment intent.
+          nullable: true
+        status:
+          $ref: '#/components/schemas/CaptureStatus'
+        message:
+          type: string
+          description: The description of the operation.
     Cursor:
       type: object
       additionalProperties: false
@@ -2883,6 +3286,262 @@ components:
       example:
         message: null
         reversalId: rvs_127usj
+    MerchantInitiatedTransactionType:
+      type: string
+      description: Details about the merchant initiated transaction type.
+      title: MerchantInitiatedTransactionType
+      x-enumNames:
+        - NoShow
+      enum:
+        - NoShow
+    CreateSetupIntentRequest:
+      type: object
+      description: The setup intent request object.
+      additionalProperties: false
+      title: CreateSetupIntentRequest
+      required:
+        - reference
+        - merchantInitiatedTransactionType
+        - terms
+      properties:
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 60
+          description: Details of the reference for the payment.
+        description:
+          type: string
+          maxLength: 4096
+          description: The payment description.
+          nullable: true
+        customer:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Customer'
+          description: Details about the customer.
+        captureMode:
+          description: |-
+            The type of capture for the payment:
+
+            - `Auto`—(Default) payments are captured automatically after authorization
+
+            - `Manual`—payments are captured by making a request [POST /payment-intents/{paymentIntentId}/captures](#operation/Captures_Create)
+          oneOf:
+            - $ref: '#/components/schemas/CaptureMode'
+        paymentMethods:
+          type: array
+          description: The payment methods that customers can use to pay.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/PaymentMethod'
+        billingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the invoice.
+        shippingDetails:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/ShippingDetails'
+          description: The address where to send the order.
+        config:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentIntentConfigRequest'
+          description: Details about the payment intent configuration.
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: A set of key-value pairs that you can use for storing additional information.
+          nullable: true
+        intendedAmount:
+          description: The amount intended to be collected by this setup intent.
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+        merchantInitiatedTransactionType:
+          $ref: '#/components/schemas/MerchantInitiatedTransactionType'
+        terms:
+          description: The terms that customers are required to review before adding a card to setup intent.
+          type: string
+          maxLength: 10240
+          minLength: 1
+    SetupIntentStatus:
+      type: string
+      description: Current status of the setup intent.
+      title: SetupIntentStatus
+      x-enumNames:
+        - Created
+        - Authorized
+        - Canceled
+        - Completed
+        - Expired
+        - CardExpired
+      enum:
+        - Created
+        - Authorized
+        - Canceled
+        - Completed
+        - Expired
+        - CardExpired
+    SetupIntentPublicResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          nullable: true
+          description: Unique identifier for the setup intent.
+        clientSessionSecret:
+          type: string
+          description: The client secret.
+          nullable: true
+        clientSessionSecretExpirationDate:
+          type: string
+          format: date-time
+          description: The expiration date of `clientSessionSecret`.
+        status:
+          $ref: '#/components/schemas/SetupIntentStatus'
+        paymentMethods:
+          type: array
+          description: The payment methods that customers can use to pay.
+          nullable: true
+          items:
+            $ref: '#/components/schemas/PaymentMethod'
+        customer:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Customer'
+          description: Details about the customer.
+        billingAddress:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Address'
+          description: The address where to send the invoice.
+        shippingDetails:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/ShippingDetails'
+          description: The address where to send the order.
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of the create date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the update date, in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+        reference:
+          type: string
+          description: Details of the reference for the payment.
+          nullable: true
+        description:
+          type: string
+          description: The payment description.
+          nullable: true
+        merchantConfig:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/MerchantConfig'
+          description: Details of payment intent merchant configuration.
+        config:
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/PaymentIntentConfigResponse'
+          description: Details about the payment intent configuration.
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: A set of key-value pairs that you can use for storing additional information.
+          nullable: true
+        intendedAmount:
+          description: The amount intended to be collected by this setup intent.
+          nullable: true
+          oneOf:
+            - $ref: '#/components/schemas/Money'
+        merchantInitiatedTransactionType:
+          $ref: '#/components/schemas/MerchantInitiatedTransactionType'
+        terms:
+          type: string
+          nullable: true
+          description: The terms that customers are required to review before adding a card to setup intent.
+    EventType:
+      type: string
+      description: The current state of the setup intent.
+      x-enumNames:
+        - Created
+        - Authorized
+        - Captured
+        - Reversed
+        - Refunded
+        - Canceled
+        - AuthChallenged
+        - Declined
+        - ManualAuthReady
+        - Error
+        - Unknown
+      enum:
+        - Created
+        - Authorized
+        - Captured
+        - Reversed
+        - Refunded
+        - Canceled
+        - AuthChallenged
+        - Declined
+        - ManualAuthReady
+        - Error
+        - Unknown
+    PaymentStatusResponse:
+      type: object
+      additionalProperties: false
+      description: The PaymentIntent object.
+      title: PaymentIntent
+      properties:
+        transactionId:
+          type: string
+          description: The unique identifier for the transaction.
+          nullable: true
+        transactionDateTime:
+          type: string
+          description: The date and time of the payment in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) UTC format.
+          nullable: true
+        eventType:
+          $ref: '#/components/schemas/EventType'
+        authCode:
+          type: string
+          description: The acquirer authorization code. This code is returned on a successful transaction.
+          nullable: true
+        cardNumber:
+          type: string
+          description: The card number.
+          nullable: true
+        expiryDate:
+          type: string
+          description: 'The expiry month and year. Format: MM/YY.'
+          nullable: true
+        cardType:
+          type: string
+          description: The card scheme.
+          nullable: true
+        cardholderName:
+          type: string
+          description: The name of the cardholder.
+          nullable: true
+    SetupIntentResponse:
+      allOf:
+        - $ref: '#/components/schemas/SetupIntentPublicResponse'
+        - type: object
+          additionalProperties: false
+          properties:
+            setupEvents:
+              type: array
+              nullable: true
+              description: Information of the setup intent
+              items:
+                $ref: '#/components/schemas/PaymentStatusResponse'
     WebhookViewModel:
       type: object
       additionalProperties: false
@@ -3229,6 +3888,8 @@ components:
             - VISA
             - MASTERCARD
             - MAESTRO
+            - DISCOVER
+            - DCI
             - AMEX
           wallets:
             - APPLE_PAY

@@ -46,7 +46,7 @@ namespace Dojo.Net.Tests
                 Reference = "test",
                 CaptureMode = CaptureMode.Manual,
                 AutoExpireAction = AutoExpireAction.Release,
-                AutoExpireAt = System.DateTime.UtcNow.AddMinutes(5)
+                AutoExpireIn = System.TimeSpan.FromMinutes(5).ToString()
             });
 
             Assert.Equal(PaymentIntentStatus.Created, pi.Status);
