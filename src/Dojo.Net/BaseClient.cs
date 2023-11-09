@@ -1,8 +1,9 @@
-using System.Text;
 using System;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Dojo.Net
 {
@@ -12,12 +13,11 @@ namespace Dojo.Net
     public class BaseClient
     {
         private const string VersionHeaderName = "version";
-        private readonly IClientAuthorization _clientAuthorization;
 
         /// <summary>
         /// HttpClient instance
         /// </summary>
-        protected readonly HttpClient _client;
+        protected readonly HttpClient Client;
 
         /// <summary>
         /// Initializes a new instance of the <c>BaseClient</c> class.
@@ -26,8 +26,10 @@ namespace Dojo.Net
         /// <param name="clientAuthorization">The IClientAuthorization instance</param>
         public BaseClient(HttpClient client, IClientAuthorization clientAuthorization)
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
-            _clientAuthorization = clientAuthorization ?? throw new ArgumentNullException(nameof(clientAuthorization));
+            Client = client ?? throw new ArgumentNullException(nameof(client));
+            var clientAuthorization1 = clientAuthorization ?? throw new ArgumentNullException(nameof(clientAuthorization));
+            clientAuthorization1.AuthorizeRequestsAsync(client);
+            Client.DefaultRequestHeaders.Add(VersionHeaderName, ApiVersion.Current);
         }
 
         /// <summary>
@@ -36,7 +38,7 @@ namespace Dojo.Net
         /// <param name="token">The cancellation token</param>
         protected Task<HttpClient> CreateHttpClientAsync(CancellationToken token)
         {
-            return Task.FromResult(_client);
+            return Task.FromResult(Client);
         }
 
         /// <summary>
@@ -45,10 +47,9 @@ namespace Dojo.Net
         /// <param name="client">The HttpClient instance</param>
         /// <param name="request">Http request message</param>
         /// <param name="urlBuilder">Url string builder</param>
-        protected async Task PrepareRequestAsync(HttpClient client, HttpRequestMessage request, StringBuilder urlBuilder)
+        protected Task PrepareRequestAsync(HttpClient client, HttpRequestMessage request, StringBuilder urlBuilder)
         {
-            request.Headers.Add(VersionHeaderName, ApiVersion.Current);
-            await _clientAuthorization.AuthorizeRequestAsync(client, request);
+            return Task.CompletedTask;
         }
 
         /// <summary>
