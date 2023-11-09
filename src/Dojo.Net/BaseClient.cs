@@ -27,8 +27,8 @@ namespace Dojo.Net
         public BaseClient(HttpClient client, IClientAuthorization clientAuthorization)
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
-            var clientAuthorization1 = clientAuthorization ?? throw new ArgumentNullException(nameof(clientAuthorization));
-            clientAuthorization1.AuthorizeRequestsAsync(client);
+            _ = clientAuthorization ?? throw new ArgumentNullException(nameof(clientAuthorization));
+            clientAuthorization.AuthorizeRequestsAsync(client);
             Client.DefaultRequestHeaders.Add(VersionHeaderName, ApiVersion.Current);
         }
 
