@@ -28,7 +28,7 @@ namespace Dojo.Net
         {
             Client = client ?? throw new ArgumentNullException(nameof(client));
             _ = clientAuthorization ?? throw new ArgumentNullException(nameof(clientAuthorization));
-            clientAuthorization.AuthorizeRequestsAsync(client);
+            clientAuthorization.AuthorizeRequests(client);
             Client.DefaultRequestHeaders.Add(VersionHeaderName, ApiVersion.Current);
         }
 

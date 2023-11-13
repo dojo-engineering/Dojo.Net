@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
@@ -21,10 +20,9 @@ namespace Dojo.Net
             _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
         }
 
-        Task IClientAuthorization.AuthorizeRequestsAsync(HttpClient client)
+        void IClientAuthorization.AuthorizeRequests(HttpClient client)
         {
             client.DefaultRequestHeaders.Authorization =  new AuthenticationHeaderValue("Basic", _apiKey);
-            return Task.CompletedTask;
         }
     }
 }

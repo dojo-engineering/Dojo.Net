@@ -13,6 +13,6 @@ namespace Dojo.Net
         /// Authorize request
         /// </summary>
         /// <param name="client">The HttpClient instance</param>
-        Task AuthorizeRequestsAsync(HttpClient client);
+        void AuthorizeRequests(HttpClient client);
     }
 }
