@@ -14,7 +14,7 @@ jobs:
       run:
         working-directory: ./src
 
-    runs-on: ubuntu-latest
+    runs-on: warp-ubuntu-latest-x64-2x
 
     steps:
     - uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.0.x
 
     - name: Build
       run: dotnet build --configuration $BUILD_CONFIG -p:Version=${{ github.event.release.tag_name }} --no-restore
