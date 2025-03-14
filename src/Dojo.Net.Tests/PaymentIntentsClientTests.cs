@@ -78,5 +78,29 @@ namespace Dojo.Net.Tests
             Assert.Equal(100, pi.Amount.Value);
             Assert.Equal("Custom Title", pi.Config.Title);
         }
+
+        [Fact]
+        public async Task CreatePaymentIntentAsync_Retrieve_ExpectRetrieved()
+        {
+            var client = new PaymentIntentsClient(
+                new HttpClient(),
+                new ApiKeyClientAuthorization(SandboxKey));
+
+            var pi = await client.CreatePaymentIntentAsync(new CreatePaymentIntentRequest
+            {
+                Amount = new Money
+                {
+                    Value = 100,
+                    CurrencyCode = "GBP"
+                },
+                Reference = "test",
+            });
+
+
+            var retrievedPi = await client.GetAsync(pi.Id);
+
+            Assert.Equal(PaymentIntentStatus.Created, retrievedPi.Status);
+            Assert.Equal(100, retrievedPi.Amount.Value);
+        }
     }
 }

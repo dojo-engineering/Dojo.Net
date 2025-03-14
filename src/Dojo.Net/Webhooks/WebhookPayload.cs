@@ -35,7 +35,7 @@ namespace Dojo.Net
         /// <summary>
         /// Account id
         /// </summary>
-        public string AcocuntId { get; set; }
+        public string AccountId { get; set; }
         /// <summary>
         /// The date when the message was created
         /// </summary>
