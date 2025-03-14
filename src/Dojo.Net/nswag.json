@@ -1,9 +1,9 @@
 ﻿{
-  "runtime": "Net60",
+  "runtime": "Net80",
   "defaultVariables": "CSharpOutputPath=./Dojo.Net",
   "documentGenerator": {
     "fromDocument": {
-      "json": "../../openapi/2022-04-07.yaml"
+      "json": "../../openapi/2024-02-05.yaml"
   }
   },
   "codeGenerators": {
