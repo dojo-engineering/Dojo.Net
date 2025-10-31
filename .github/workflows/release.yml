@@ -33,15 +33,18 @@ jobs:
     - name: Run tests
       run: dotnet test /p:Configuration=$BUILD_CONFIG --no-restore --no-build --verbosity normal
 
-    - name: Export certificate
-      id: write_file
-      uses: timheuer/base64-to-file@v1.1
-      with:
-        fileName: 'sign.cer'
-        encodedString: ${{ secrets.NUGET_SIGNING_CERT }}
+      
+    # RELEASE UNSIGNED FOR NOW, new signing cert in a gcp wallet is being issued,
+    # waiting to get workload identity federation for this repo to be set up
+    # - name: Export certificate
+    #   id: write_file
+    #   uses: timheuer/base64-to-file@v1.1
+    #   with:
+    #     fileName: 'sign.cer'
+    #     encodedString: ${{ secrets.NUGET_SIGNING_CERT }}
 
-    - name: Sign
-      run: dotnet nuget sign **\*.nupkg --certificate-path ${{ steps.write_file.outputs.filePath }} --certificate-password ${{ secrets.NUGET_SIGNING_CERT_PASSWORD }} --timestamper http://timestamp.digicert.com
+    # - name: Sign
+    #   run: dotnet nuget sign **\*.nupkg --certificate-path ${{ steps.write_file.outputs.filePath }} --certificate-password ${{ secrets.NUGET_SIGNING_CERT_PASSWORD }} --timestamper http://timestamp.digicert.com
 
     - name: Publish
-      run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
+      run: dotnet nuget push **/*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
