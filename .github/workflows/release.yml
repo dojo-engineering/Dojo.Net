@@ -3,6 +3,17 @@ name: Publish Nuget
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 1.0.0)'
+        required: false
+        default: '0.0.1-test'
+      skip_publish:
+        description: 'Skip publishing to NuGet (test signing only)'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -10,11 +21,15 @@ jobs:
       BUILD_CONFIG: 'Release'
       PROJECT: 'Dojo.Net.csproj'
 
+    runs-on: windows-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     defaults:
       run:
         working-directory: ./src
-
-    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -28,23 +43,37 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration $BUILD_CONFIG -p:Version=${{ github.event.release.tag_name }} --no-restore
+      run: dotnet build --configuration $env:BUILD_CONFIG -p:Version=${{ github.event.release.tag_name || inputs.version }} --no-restore
 
     - name: Run tests
-      run: dotnet test /p:Configuration=$BUILD_CONFIG --no-restore --no-build --verbosity normal
+      run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
 
-      
-    # RELEASE UNSIGNED FOR NOW, new signing cert in a gcp wallet is being issued,
-    # waiting to get workload identity federation for this repo to be set up
-    # - name: Export certificate
-    #   id: write_file
-    #   uses: timheuer/base64-to-file@v1.1
-    #   with:
-    #     fileName: 'sign.cer'
-    #     encodedString: ${{ secrets.NUGET_SIGNING_CERT }}
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
 
-    # - name: Sign
-    #   run: dotnet nuget sign **\*.nupkg --certificate-path ${{ steps.write_file.outputs.filePath }} --certificate-password ${{ secrets.NUGET_SIGNING_CERT_PASSWORD }} --timestamper http://timestamp.digicert.com
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Install Google Cloud HSM SignTool
+      run: |
+        gcloud components install kms-windows-cng --quiet
+        
+    - name: Sign NuGet packages
+      shell: pwsh
+      run: |
+        $packages = Get-ChildItem -Recurse -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
+        foreach ($package in $packages) {
+          Write-Host "Signing $($package.FullName)"
+          & signtool sign /v /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
+            /sha1 90C591BF5D43D241871569B3A222A72DD76DFA8A `
+            /csp "Google Cloud KMS Provider" `
+            /kc "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1" `
+            $package.FullName
+        }
 
     - name: Publish
-      run: dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
+      if: ${{ github.event_name == 'release' || inputs.skip_publish == false }}
+      run: dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
