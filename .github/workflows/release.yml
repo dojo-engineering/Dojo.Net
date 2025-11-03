@@ -3,17 +3,9 @@ name: Publish Nuget
 on:
   release:
     types: [published]
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version to build (e.g., 1.0.0)'
-        required: false
-        default: '0.0.1-test'
-      skip_publish:
-        description: 'Skip publishing to NuGet (test signing only)'
-        required: false
-        type: boolean
-        default: true
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -43,7 +35,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration $env:BUILD_CONFIG -p:Version=${{ github.event.release.tag_name || inputs.version }} --no-restore
+      run: dotnet build --configuration $env:BUILD_CONFIG -p:Version=${{ github.event.release.tag_name || '0.0.1-test' }} --no-restore
 
     - name: Run tests
       run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
@@ -75,5 +67,5 @@ jobs:
         }
 
     - name: Publish
-      if: ${{ github.event_name == 'release' || inputs.skip_publish == false }}
+      if: ${{ github.event_name == 'release' }}
       run: dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
