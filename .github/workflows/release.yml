@@ -40,6 +40,9 @@ jobs:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
 
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v3
+
     - name: Download and install Google Cloud KMS CNG Provider
       shell: pwsh
       working-directory: ${{ github.workspace }}
