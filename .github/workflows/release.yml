@@ -35,17 +35,49 @@ jobs:
       run: dotnet restore
 
     - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v3
+      uses: google-github-actions/auth@v2
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
 
-    - name: Setup Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v2
-
-    - name: Install Google Cloud HSM SignTool
+    - name: Download and install Google Cloud KMS CNG Provider
+      shell: pwsh
       run: |
-        gcloud components install kms-windows-cng --quiet
+        # Download KMS CNG Provider v1.3
+        $version = "1.3"
+        $downloadUrl = "https://github.com/GoogleCloudPlatform/kms-integrations/releases/download/cng-v$version/kmscng-$version-windows-amd64.zip"
+        
+        Write-Host "Downloading KMS CNG Provider v$version from $downloadUrl"
+        Invoke-WebRequest -Uri $downloadUrl -OutFile "kmscng.zip"
+        
+        # Extract the ZIP
+        Write-Host "Extracting KMS CNG Provider"
+        Expand-Archive -Path "kmscng.zip" -DestinationPath "kmscng" -Force
+        
+        # Install the MSI
+        $msiFile = "kmscng\kmscng.msi"
+        Write-Host "Installing KMS CNG Provider from $msiFile"
+        Start-Process msiexec.exe -ArgumentList '/i', $msiFile, '/quiet', '/norestart' -Wait -NoNewWindow
+        
+        Write-Host "KMS CNG Provider v$version installed successfully"
+
+    - name: Configure KMS CNG Provider
+      shell: pwsh
+      run: |
+        # Create the config directory
+        $configDir = "C:\Windows\KMSCNG"
+        New-Item -ItemType Directory -Force -Path $configDir | Out-Null
+        
+        # Create the config file
+        $configContent = @"
+        ---
+        resources:
+          - crypto_key_version: "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1"
+        "@
+        
+        Set-Content -Path "$configDir\config.yaml" -Value $configContent
+        Write-Host "Configuration file created at $configDir\config.yaml"
+        Get-Content "$configDir\config.yaml"
 
     - name: Build
       run: dotnet build --configuration $env:BUILD_CONFIG -p:Version=${{ github.event.release.tag_name || '0.0.1-test' }} --no-restore /maxcpucount:1
