@@ -55,12 +55,8 @@ jobs:
         Write-Host "Extracting KMS CNG Provider"
         Expand-Archive -Path "kmscng.zip" -DestinationPath "kmscng" -Force
         
-        # List contents to debug
-        Write-Host "Contents of kmscng directory:"
-        Get-ChildItem -Path "kmscng" -Recurse
-        
         # Install the MSI with full path
-        $msiFile = Resolve-Path "kmscng\kmscng.msi"
+        $msiFile = Resolve-Path "kmscng\kmscng-$version-windows-amd64\kmscng.msi"
         Write-Host "Installing KMS CNG Provider from $msiFile"
         
         $installArgs = @(
