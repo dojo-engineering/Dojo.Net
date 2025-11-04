@@ -44,6 +44,7 @@ jobs:
       uses: google-github-actions/setup-gcloud@v3
 
     - name: Download Jsign
+      working-directory: ${{ github.workspace }}
       run: |
         version="7.4"
         downloadUrl="https://github.com/ebourg/jsign/releases/download/$version/jsign-$version.jar"
