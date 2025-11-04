@@ -150,6 +150,51 @@ jobs:
           --keyring EVCodeSigningKeyRing `
           --location europe-west2 `
           --project ${{ secrets.GCP_PROJECT_ID }} 2>&1
+
+    - name: Import certificate into Windows certificate store
+      shell: pwsh
+      working-directory: ${{ github.workspace }}
+      run: |
+        Write-Host "=== Importing Public Certificate ==="
+        
+        # We should have the public key from the previous step
+        # Convert PEM to CER format and import
+        if (Test-Path "public-key.pem") {
+          # Import the certificate that was uploaded to NuGet
+          $certPath = "${{ github.workspace }}/publicert.cer"
+          
+          if (Test-Path $certPath) {
+            Write-Host "Importing certificate from $certPath"
+            
+            # Import to LocalMachine\My store
+            $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My
+            Write-Host "Certificate imported successfully"
+            Write-Host "Subject: $($cert.Subject)"
+            Write-Host "Thumbprint: $($cert.Thumbprint)"
+            Write-Host "NotAfter: $($cert.NotAfter)"
+            
+            # Verify it matches our expected thumbprint
+            if ($cert.Thumbprint -eq "90C591BF5D43D241871569B3A222A72DD76DFA8A") {
+              Write-Host "✓ Certificate thumbprint matches!"
+            } else {
+              Write-Host "✗ WARNING: Thumbprint mismatch! Expected: 90C591BF5D43D241871569B3A222A72DD76DFA8A, Got: $($cert.Thumbprint)"
+            }
+          } else {
+            Write-Host "ERROR: publicert.cer not found in repository"
+            exit 1
+          }
+        } else {
+          Write-Host "WARNING: public-key.pem not found from previous step"
+        }
+        
+        Write-Host "`n=== Verifying Certificate Import ==="
+        $thumbprint = "90C591BF5D43D241871569B3A222A72DD76DFA8A"
+        $cert = Get-ChildItem Cert:\LocalMachine\My\$thumbprint -ErrorAction SilentlyContinue
+        if ($cert) {
+          Write-Host "✓ Certificate found in LocalMachine\My store"
+        } else {
+          Write-Host "✗ Certificate NOT found in certificate store"
+        }
         
         Write-Host "`n=== Listing Certificate Stores ==="
         Get-ChildItem Cert:\CurrentUser\My | Format-Table Subject, Thumbprint, NotAfter
@@ -158,20 +203,6 @@ jobs:
         Write-Host "`n=== Checking for Google Cloud KMS Provider ==="
         # Try to list keys using CNG provider
         certutil -csp "Google Cloud KMS Provider" -key
-        
-        Write-Host "`n=== Checking if our certificate thumbprint exists ==="
-        $thumbprint = "90C591BF5D43D241871569B3A222A72DD76DFA8A"
-        $cert = Get-ChildItem Cert:\CurrentUser\My\$thumbprint -ErrorAction SilentlyContinue
-        if ($cert) {
-          Write-Host "Found certificate in CurrentUser\My: $($cert.Subject)"
-        } else {
-          $cert = Get-ChildItem Cert:\LocalMachine\My\$thumbprint -ErrorAction SilentlyContinue
-          if ($cert) {
-            Write-Host "Found certificate in LocalMachine\My: $($cert.Subject)"
-          } else {
-            Write-Host "Certificate with thumbprint $thumbprint NOT FOUND in certificate stores"
-          }
-        }
 
     - name: Restore dependencies
       run: dotnet restore
