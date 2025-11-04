@@ -152,60 +152,71 @@ jobs:
           --location europe-west2 `
           --project ${{ secrets.GCP_PROJECT_ID }} 2>&1
 
-    - name: Import certificate into Windows certificate store
+    - name: Import certificate and link to KMS CNG Provider
       shell: pwsh
       working-directory: ${{ github.workspace }}
       run: |
-        Write-Host "=== Importing Public Certificate ==="
+        Write-Host "=== Importing Certificate with KMS CNG Provider Link ==="
         
         $certPath = ".github/signing_cert.cer"
+        $kmsKeyPath = "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1"
         
         if (-not (Test-Path $certPath)) {
           Write-Host "ERROR: $certPath not found"
           exit 1
         }
         
-        Write-Host "Importing certificate from $certPath"
+        # Import certificate and associate with KMS CNG Provider
+        # We need to use certutil to properly link the cert with the CNG provider
+        Write-Host "Importing certificate with CNG provider association..."
         
-        # Import to LocalMachine\My store
-        $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My
+        # First, import the certificate
+        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath)
+        
+        # Create a certificate with private key reference to KMS
+        # The key container name is the KMS key path
+        $store = New-Object System.Security.Cryptography.X509Certificates.X509Store("My", "LocalMachine")
+        $store.Open("ReadWrite")
+        
+        # Check if cert already exists
+        $existing = $store.Certificates | Where-Object { $_.Thumbprint -eq $cert.Thumbprint }
+        if ($existing) {
+          Write-Host "Removing existing certificate..."
+          $store.Remove($existing)
+        }
+        
+        # Import the certificate
+        $store.Add($cert)
+        $store.Close()
+        
         Write-Host "Certificate imported successfully"
         Write-Host "Subject: $($cert.Subject)"
         Write-Host "Thumbprint: $($cert.Thumbprint)"
         Write-Host "NotAfter: $($cert.NotAfter)"
         
-        # Verify it matches our expected thumbprint
-        if ($cert.Thumbprint -eq "90C591BF5D43D241871569B3A222A72DD76DFA8A") {
-          Write-Host "✓ Certificate thumbprint matches!"
-        } else {
-          Write-Host "✗ WARNING: Thumbprint mismatch! Expected: 90C591BF5D43D241871569B3A222A72DD76DFA8A, Got: $($cert.Thumbprint)"
+        # Now link the certificate to the KMS CNG provider using certutil
+        Write-Host "`nLinking certificate to Google Cloud KMS Provider..."
+        Write-Host "KMS Key Path: $kmsKeyPath"
+        
+        # Use certutil to set the private key property
+        $thumbprint = $cert.Thumbprint
+        
+        # This command links the certificate to the CNG provider
+        certutil -repairstore -csp "Google Cloud KMS Provider" My $thumbprint
+        
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "Warning: certutil repairstore returned exit code $LASTEXITCODE"
         }
         
-        Write-Host "`n=== Verifying Certificate Import ==="
-        $thumbprint = "90C591BF5D43D241871569B3A222A72DD76DFA8A"
-        $cert = Get-ChildItem Cert:\LocalMachine\My\$thumbprint -ErrorAction SilentlyContinue
-        if ($cert) {
+        Write-Host "`n=== Verifying Certificate ==="
+        $verifiedCert = Get-ChildItem Cert:\LocalMachine\My\$thumbprint -ErrorAction SilentlyContinue
+        if ($verifiedCert) {
           Write-Host "✓ Certificate found in LocalMachine\My store"
+          Write-Host "Has Private Key: $($verifiedCert.HasPrivateKey)"
         } else {
           Write-Host "✗ Certificate NOT found in certificate store"
+          exit 1
         }
-        
-        Write-Host "`n=== Verifying Certificate Import ==="
-        $thumbprint = "90C591BF5D43D241871569B3A222A72DD76DFA8A"
-        $cert = Get-ChildItem Cert:\LocalMachine\My\$thumbprint -ErrorAction SilentlyContinue
-        if ($cert) {
-          Write-Host "✓ Certificate found in LocalMachine\My store"
-        } else {
-          Write-Host "✗ Certificate NOT found in certificate store"
-        }
-        
-        Write-Host "`n=== Listing Certificate Stores ==="
-        Get-ChildItem Cert:\CurrentUser\My | Format-Table Subject, Thumbprint, NotAfter
-        Get-ChildItem Cert:\LocalMachine\My | Format-Table Subject, Thumbprint, NotAfter
-        
-        Write-Host "`n=== Checking for Google Cloud KMS Provider ==="
-        # Try to list keys using CNG provider
-        certutil -csp "Google Cloud KMS Provider" -key
 
     - name: Restore dependencies
       run: dotnet restore
@@ -221,33 +232,27 @@ jobs:
       env:
         WORKSPACE: ${{ github.workspace }}
       run: |
-        # Find SignTool from Windows SDK
-        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue | 
-                        Where-Object { $_.FullName -like "*\x64\*" } | 
-                        Select-Object -First 1
+        # Use the certificate thumbprint to sign from the Windows certificate store
+        # The certificate has its private key backed by Google Cloud KMS via CNG Provider
+        $thumbprint = "90C591BF5D43D241871569B3A222A72DD76DFA8A"
         
-        if (-not $signtoolPath) {
-          Write-Error "Could not find signtool.exe"
-          exit 1
-        }
-        
-        Write-Host "Using SignTool from: $($signtoolPath.FullName)"
-        
-        $certPath = Join-Path $env:WORKSPACE ".github\signing_cert.cer"
-        Write-Host "Certificate path: $certPath"
-        if (-not (Test-Path $certPath)) {
-          Write-Error "Certificate file not found at $certPath"
-          exit 1
-        }
+        Write-Host "Signing packages with certificate thumbprint: $thumbprint"
         
         $packages = Get-ChildItem -Recurse -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
         foreach ($package in $packages) {
           Write-Host "Signing $($package.FullName)"
-          & $signtoolPath.FullName sign /v /debug /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
-            /f $certPath `
-            /csp "Google Cloud KMS Provider" `
-            /kc "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1" `
-            $package.FullName
+          dotnet nuget sign $package.FullName `
+            --certificate-fingerprint $thumbprint `
+            --certificate-store-location LocalMachine `
+            --certificate-store-name My `
+            --timestamper "http://timestamp.digicert.com" `
+            --hash-algorithm SHA256 `
+            --verbosity detailed
+          
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to sign package: $($package.FullName)"
+            exit 1
+          }
         }
 
     - name: Publish
