@@ -234,8 +234,8 @@ jobs:
         $packages = Get-ChildItem -Recurse -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
         foreach ($package in $packages) {
           Write-Host "Signing $($package.FullName)"
-          & $signtoolPath.FullName sign /v /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
-            /sha1 90C591BF5D43D241871569B3A222A72DD76DFA8A `
+          & $signtoolPath.FullName sign /v /debug /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
+            /f .github/signing_cert.cer `
             /csp "Google Cloud KMS Provider" `
             /kc "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1" `
             $package.FullName
