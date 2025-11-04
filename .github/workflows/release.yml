@@ -158,21 +158,13 @@ jobs:
       run: |
         Write-Host "=== Importing Public Certificate ==="
         
-        # Convert PEM to CER format using OpenSSL (comes with Git for Windows)
-        if (-not (Test-Path "public-key.pem")) {
-          Write-Host "ERROR: public-key.pem not found from previous step"
+        $certPath = ".github/signing_cert.cer"
+        
+        if (-not (Test-Path $certPath)) {
+          Write-Host "ERROR: $certPath not found"
           exit 1
         }
         
-        Write-Host "Converting public-key.pem to DER format..."
-        & "C:\Program Files\Git\usr\bin\openssl.exe" x509 -in public-key.pem -inform PEM -out publicert.cer -outform DER
-        
-        if (-not (Test-Path "publicert.cer")) {
-          Write-Host "ERROR: Failed to convert PEM to CER"
-          exit 1
-        }
-        
-        $certPath = "${{ github.workspace }}/publicert.cer"
         Write-Host "Importing certificate from $certPath"
         
         # Import to LocalMachine\My store
@@ -187,6 +179,15 @@ jobs:
           Write-Host "✓ Certificate thumbprint matches!"
         } else {
           Write-Host "✗ WARNING: Thumbprint mismatch! Expected: 90C591BF5D43D241871569B3A222A72DD76DFA8A, Got: $($cert.Thumbprint)"
+        }
+        
+        Write-Host "`n=== Verifying Certificate Import ==="
+        $thumbprint = "90C591BF5D43D241871569B3A222A72DD76DFA8A"
+        $cert = Get-ChildItem Cert:\LocalMachine\My\$thumbprint -ErrorAction SilentlyContinue
+        if ($cert) {
+          Write-Host "✓ Certificate found in LocalMachine\My store"
+        } else {
+          Write-Host "✗ Certificate NOT found in certificate store"
         }
         
         Write-Host "`n=== Verifying Certificate Import ==="
