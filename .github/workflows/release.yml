@@ -104,6 +104,7 @@ jobs:
 
     - name: Debug - List available certificates and keys
       shell: pwsh
+      working-directory: ${{ github.workspace }}
       run: |
         Write-Host "=== GCP Project Information ==="
         Write-Host "GCP_PROJECT_ID secret value: ${{ secrets.GCP_PROJECT_ID }}"
