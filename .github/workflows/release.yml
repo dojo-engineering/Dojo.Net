@@ -13,7 +13,7 @@ jobs:
       BUILD_CONFIG: 'Release'
       PROJECT: 'Dojo.Net.csproj'
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     permissions:
       contents: 'read'
@@ -43,193 +43,55 @@ jobs:
     - name: Setup Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v3
 
-    - name: Download and install Google Cloud KMS CNG Provider
-      shell: pwsh
-      working-directory: ${{ github.workspace }}
+    - name: Download Jsign
       run: |
-        # Download KMS CNG Provider v1.3
-        $version = "1.3"
-        $downloadUrl = "https://github.com/GoogleCloudPlatform/kms-integrations/releases/download/cng-v$version/kmscng-$version-windows-amd64.zip"
+        version="7.4"
+        downloadUrl="https://github.com/ebourg/jsign/releases/download/$version/jsign-$version.jar"
         
-        Write-Host "Downloading KMS CNG Provider v$version from $downloadUrl"
-        Invoke-WebRequest -Uri $downloadUrl -OutFile "kmscng.zip"
+        echo "Downloading Jsign v$version from $downloadUrl"
+        wget -q $downloadUrl -O jsign.jar
         
-        # Extract the ZIP
-        Write-Host "Extracting KMS CNG Provider"
-        Expand-Archive -Path "kmscng.zip" -DestinationPath "kmscng" -Force
-        
-        # Install the MSI with full path
-        $msiFile = Resolve-Path "kmscng\kmscng-$version-windows-amd64\kmscng.msi"
-        Write-Host "Installing KMS CNG Provider from $msiFile"
-        
-        $installArgs = @(
-          '/i'
-          $msiFile.Path
-          '/quiet'
-          '/norestart'
-          '/l*v'
-          'install.log'
-        )
-        
-        $process = Start-Process msiexec.exe -ArgumentList $installArgs -Wait -NoNewWindow -PassThru
-        
-        if ($process.ExitCode -ne 0) {
-          Write-Host "Installation failed with exit code: $($process.ExitCode)"
-          if (Test-Path 'install.log') {
-            Write-Host "Installation log:"
-            Get-Content 'install.log' | Select-Object -Last 50
-          }
-          exit 1
-        }
-        
-        Write-Host "KMS CNG Provider v$version installed successfully"
-
-    - name: Configure KMS CNG Provider
-      shell: pwsh
-      run: |
-        # Create the config directory
-        $configDir = "C:\Windows\KMSCNG"
-        New-Item -ItemType Directory -Force -Path $configDir | Out-Null
-        
-        # Create the config file
-        $configContent = @"
-        ---
-        resources:
-          - crypto_key_version: "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1"
-        "@
-        
-        Set-Content -Path "$configDir\config.yaml" -Value $configContent
-        Write-Host "Configuration file created at $configDir\config.yaml"
-        Get-Content "$configDir\config.yaml"
-
-    - name: Debug - List available certificates and keys
-      shell: pwsh
-      working-directory: ${{ github.workspace }}
-      run: |
-        Write-Host "=== GCP Project Information ==="
-        Write-Host "GCP_PROJECT_ID secret value: ${{ secrets.GCP_PROJECT_ID }}"
-        Write-Host "Getting project details..."
-        $projectInfo = gcloud projects describe ${{ secrets.GCP_PROJECT_ID }} --format=json | ConvertFrom-Json
-        Write-Host "Project ID (name): $($projectInfo.projectId)"
-        Write-Host "Project Number: $($projectInfo.projectNumber)"
-        
-        Write-Host "`n=== Checking KMS CNG Provider Configuration ==="
-        if (Test-Path "C:\Windows\KMSCNG\config.yaml") {
-          Write-Host "Config file exists:"
-          Get-Content "C:\Windows\KMSCNG\config.yaml"
-        } else {
-          Write-Host "WARNING: Config file not found!"
-        }
-        
-        Write-Host "`n=== Testing GCP Authentication ==="
-        gcloud auth list
-        
-        Write-Host "`n=== Testing KMS Key Access ==="
-        # Try to get the public key
-        gcloud kms keys versions get-public-key 1 `
-          --key EVCodeSignDojo `
-          --keyring EVCodeSigningKeyRing `
-          --location europe-west2 `
-          --project ${{ secrets.GCP_PROJECT_ID }} `
-          --output-file public-key.pem 2>&1
-        
-        if (Test-Path "public-key.pem") {
-          Write-Host "Successfully retrieved public key!"
-          Get-Content "public-key.pem"
-        } else {
-          Write-Host "Failed to retrieve public key"
-        }
-        
-        Write-Host "`n=== Listing accessible KMS keys ==="
-        gcloud kms keys list `
-          --keyring EVCodeSigningKeyRing `
-          --location europe-west2 `
-          --project ${{ secrets.GCP_PROJECT_ID }} 2>&1
-        
-        Write-Host "`n=== Checking IAM permissions on the key ==="
-        gcloud kms keys get-iam-policy EVCodeSignDojo `
-          --keyring EVCodeSigningKeyRing `
-          --location europe-west2 `
-          --project ${{ secrets.GCP_PROJECT_ID }} 2>&1
-
-    - name: Link certificate to KMS CNG Provider key
-      shell: pwsh
-      working-directory: ${{ github.workspace }}
-      run: |
-        Write-Host "=== Linking Certificate to KMS Private Key ==="
-        
-        $certPath = ".github/signing_cert.cer"
-        $kmsKeyPath = "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1"
-        
-        # Load the public certificate
-        $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath)
-        
-        # Create a CNG key object that references the KMS key
-        $cngProvider = [System.Security.Cryptography.CngProvider]::new("Google Cloud KMS Provider")
-        $cngKey = [System.Security.Cryptography.CngKey]::Open($kmsKeyPath, $cngProvider)
-        
-        # Create an RSA object with the CNG key
-        $rsa = [System.Security.Cryptography.RSACng]::new($cngKey)
-        
-        # Create a new certificate that combines the public cert with the CNG private key
-        $certWithKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::CopyWithPrivateKey($cert, $rsa)
-        
-        # Import this certificate with private key into the store
-        $store = [System.Security.Cryptography.X509Certificates.X509Store]::new("My", "LocalMachine")
-        $store.Open("ReadWrite")
-        
-        # Remove existing cert if present
-        $existing = $store.Certificates | Where-Object { $_.Thumbprint -eq $cert.Thumbprint }
-        if ($existing) {
-          $store.Remove($existing)
-        }
-        
-        $store.Add($certWithKey)
-        $store.Close()
-        
-        Write-Host "Certificate with KMS private key added to store"
-        Write-Host "Thumbprint: $($certWithKey.Thumbprint)"
-        
-        # Verify
-        $verifiedCert = Get-ChildItem Cert:\LocalMachine\My\$($cert.Thumbprint)
-        Write-Host "Has Private Key: $($verifiedCert.HasPrivateKey)"
+        echo "Jsign downloaded successfully"
 
     - name: Restore dependencies
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --configuration $env:BUILD_CONFIG -p:Version=${{ github.event.release.tag_name || '0.0.1-test' }} --no-restore /maxcpucount:1
+      run: dotnet build --configuration $BUILD_CONFIG -p:Version=${{ github.event.release.tag_name || '0.0.1-test' }} --no-restore
 
     - name: Run tests
-      run: dotnet test /p:Configuration=$env:BUILD_CONFIG --no-restore --no-build --verbosity normal
+      run: dotnet test /p:Configuration=$BUILD_CONFIG --no-restore --no-build --verbosity normal
         
     - name: Sign NuGet packages
-      shell: pwsh
       run: |
-        $thumbprint = "90C591BF5D43D241871569B3A222A72DD76DFA8A"
+        certPath="${{ github.workspace }}/.github/signing_cert.cer"
+        kmsKeyPath="projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1"
+        accessToken=$(gcloud auth print-access-token)
+        
+        echo "Signing NuGet packages with Jsign + Google Cloud KMS"
         
         # Find all .nupkg files (excluding symbols packages)
-        $packages = Get-ChildItem -Recurse -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
-        
-        foreach ($package in $packages) {
-          Write-Host "Signing $($package.FullName)"
+        find . -name "*.nupkg" ! -name "*.symbols.nupkg" | while read package; do
+          echo "Signing $package"
           
-          dotnet nuget sign $package.FullName `
-            --certificate-fingerprint $thumbprint `
-            --certificate-store-location LocalMachine `
-            --certificate-store-name My `
-            --timestamper "http://timestamp.digicert.com" `
-            --hash-algorithm SHA256 `
-            --verbosity detailed
+          java -jar ${{ github.workspace }}/jsign.jar \
+            --storetype GOOGLECLOUD \
+            --keystore "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing" \
+            --storepass "$accessToken" \
+            --alias "EVCodeSignDojo/cryptoKeyVersions/1" \
+            --certfile "$certPath" \
+            --tsaurl "http://timestamp.digicert.com" \
+            --tsmode RFC3161 \
+            "$package"
           
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to sign package: $($package.FullName)"
+          if [ $? -ne 0 ]; then
+            echo "Failed to sign package: $package"
             exit 1
-          }
-        }
+          fi
+        done
         
-        Write-Host "All packages signed successfully"
+        echo "All packages signed successfully"
 
     - name: Publish
       if: ${{ github.event_name == 'release' }}
-      run: dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
+      run: dotnet nuget push '**/*.nupkg' --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
