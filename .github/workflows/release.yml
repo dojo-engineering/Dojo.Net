@@ -152,71 +152,47 @@ jobs:
           --location europe-west2 `
           --project ${{ secrets.GCP_PROJECT_ID }} 2>&1
 
-    - name: Import certificate and link to KMS CNG Provider
+    - name: Link certificate to KMS CNG Provider key
       shell: pwsh
       working-directory: ${{ github.workspace }}
       run: |
-        Write-Host "=== Importing Certificate with KMS CNG Provider Link ==="
+        Write-Host "=== Linking Certificate to KMS Private Key ==="
         
         $certPath = ".github/signing_cert.cer"
         $kmsKeyPath = "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1"
         
-        if (-not (Test-Path $certPath)) {
-          Write-Host "ERROR: $certPath not found"
-          exit 1
-        }
-        
-        # Import certificate and associate with KMS CNG Provider
-        # We need to use certutil to properly link the cert with the CNG provider
-        Write-Host "Importing certificate with CNG provider association..."
-        
-        # First, import the certificate
+        # Load the public certificate
         $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath)
         
-        # Create a certificate with private key reference to KMS
-        # The key container name is the KMS key path
-        $store = New-Object System.Security.Cryptography.X509Certificates.X509Store("My", "LocalMachine")
+        # Create a CNG key object that references the KMS key
+        $cngProvider = [System.Security.Cryptography.CngProvider]::new("Google Cloud KMS Provider")
+        $cngKey = [System.Security.Cryptography.CngKey]::Open($kmsKeyPath, $cngProvider)
+        
+        # Create an RSA object with the CNG key
+        $rsa = [System.Security.Cryptography.RSACng]::new($cngKey)
+        
+        # Create a new certificate that combines the public cert with the CNG private key
+        $certWithKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::CopyWithPrivateKey($cert, $rsa)
+        
+        # Import this certificate with private key into the store
+        $store = [System.Security.Cryptography.X509Certificates.X509Store]::new("My", "LocalMachine")
         $store.Open("ReadWrite")
         
-        # Check if cert already exists
+        # Remove existing cert if present
         $existing = $store.Certificates | Where-Object { $_.Thumbprint -eq $cert.Thumbprint }
         if ($existing) {
-          Write-Host "Removing existing certificate..."
           $store.Remove($existing)
         }
         
-        # Import the certificate
-        $store.Add($cert)
+        $store.Add($certWithKey)
         $store.Close()
         
-        Write-Host "Certificate imported successfully"
-        Write-Host "Subject: $($cert.Subject)"
-        Write-Host "Thumbprint: $($cert.Thumbprint)"
-        Write-Host "NotAfter: $($cert.NotAfter)"
+        Write-Host "Certificate with KMS private key added to store"
+        Write-Host "Thumbprint: $($certWithKey.Thumbprint)"
         
-        # Now link the certificate to the KMS CNG provider using certutil
-        Write-Host "`nLinking certificate to Google Cloud KMS Provider..."
-        Write-Host "KMS Key Path: $kmsKeyPath"
-        
-        # Use certutil to set the private key property
-        $thumbprint = $cert.Thumbprint
-        
-        # This command links the certificate to the CNG provider
-        certutil -repairstore -csp "Google Cloud KMS Provider" My $thumbprint
-        
-        if ($LASTEXITCODE -ne 0) {
-          Write-Host "Warning: certutil repairstore returned exit code $LASTEXITCODE"
-        }
-        
-        Write-Host "`n=== Verifying Certificate ==="
-        $verifiedCert = Get-ChildItem Cert:\LocalMachine\My\$thumbprint -ErrorAction SilentlyContinue
-        if ($verifiedCert) {
-          Write-Host "✓ Certificate found in LocalMachine\My store"
-          Write-Host "Has Private Key: $($verifiedCert.HasPrivateKey)"
-        } else {
-          Write-Host "✗ Certificate NOT found in certificate store"
-          exit 1
-        }
+        # Verify
+        $verifiedCert = Get-ChildItem Cert:\LocalMachine\My\$($cert.Thumbprint)
+        Write-Host "Has Private Key: $($verifiedCert.HasPrivateKey)"
 
     - name: Restore dependencies
       run: dotnet restore
@@ -229,18 +205,15 @@ jobs:
         
     - name: Sign NuGet packages
       shell: pwsh
-      env:
-        WORKSPACE: ${{ github.workspace }}
       run: |
-        # Use the certificate thumbprint to sign from the Windows certificate store
-        # The certificate has its private key backed by Google Cloud KMS via CNG Provider
         $thumbprint = "90C591BF5D43D241871569B3A222A72DD76DFA8A"
         
-        Write-Host "Signing packages with certificate thumbprint: $thumbprint"
-        
+        # Find all .nupkg files (excluding symbols packages)
         $packages = Get-ChildItem -Recurse -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
+        
         foreach ($package in $packages) {
           Write-Host "Signing $($package.FullName)"
+          
           dotnet nuget sign $package.FullName `
             --certificate-fingerprint $thumbprint `
             --certificate-store-location LocalMachine `
@@ -254,6 +227,8 @@ jobs:
             exit 1
           }
         }
+        
+        Write-Host "All packages signed successfully"
 
     - name: Publish
       if: ${{ github.event_name == 'release' }}
