@@ -79,6 +79,42 @@ jobs:
         Write-Host "Configuration file created at $configDir\config.yaml"
         Get-Content "$configDir\config.yaml"
 
+    - name: Debug - List available certificates and keys
+      shell: pwsh
+      run: |
+        Write-Host "=== Checking KMS CNG Provider Configuration ==="
+        if (Test-Path "C:\Windows\KMSCNG\config.yaml") {
+          Write-Host "Config file exists:"
+          Get-Content "C:\Windows\KMSCNG\config.yaml"
+        } else {
+          Write-Host "WARNING: Config file not found!"
+        }
+        
+        Write-Host "`n=== Listing Certificate Stores ==="
+        Get-ChildItem Cert:\CurrentUser\My | Format-Table Subject, Thumbprint, NotAfter
+        Get-ChildItem Cert:\LocalMachine\My | Format-Table Subject, Thumbprint, NotAfter
+        
+        Write-Host "`n=== Checking for Google Cloud KMS Provider ==="
+        # Try to list keys using CNG provider
+        certutil -csp "Google Cloud KMS Provider" -key
+        
+        Write-Host "`n=== Checking if our certificate thumbprint exists ==="
+        $thumbprint = "90C591BF5D43D241871569B3A222A72DD76DFA8A"
+        $cert = Get-ChildItem Cert:\CurrentUser\My\$thumbprint -ErrorAction SilentlyContinue
+        if ($cert) {
+          Write-Host "Found certificate in CurrentUser\My: $($cert.Subject)"
+        } else {
+          $cert = Get-ChildItem Cert:\LocalMachine\My\$thumbprint -ErrorAction SilentlyContinue
+          if ($cert) {
+            Write-Host "Found certificate in LocalMachine\My: $($cert.Subject)"
+          } else {
+            Write-Host "Certificate with thumbprint $thumbprint NOT FOUND in certificate stores"
+          }
+        }
+
+    - name: Restore dependencies
+      run: dotnet restore
+
     - name: Build
       run: dotnet build --configuration $env:BUILD_CONFIG -p:Version=${{ github.event.release.tag_name || '0.0.1-test' }} --no-restore /maxcpucount:1
 
