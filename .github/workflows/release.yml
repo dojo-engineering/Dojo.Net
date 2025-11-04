@@ -10,11 +10,15 @@ jobs:
       BUILD_CONFIG: 'Release'
       PROJECT: 'Dojo.Net.csproj'
 
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     defaults:
       run:
         working-directory: ./src
-
-    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -27,24 +31,66 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v3
+
+    - name: Download Jsign
+      working-directory: ${{ github.workspace }}
+      run: |
+        version="7.4"
+        downloadUrl="https://github.com/ebourg/jsign/releases/download/$version/jsign-$version.jar"
+        
+        echo "Downloading Jsign v$version from $downloadUrl"
+        wget -q $downloadUrl -O jsign.jar
+        
+        echo "Jsign downloaded successfully"
+
+    - name: Restore dependencies
+      run: dotnet restore
+
     - name: Build
-      run: dotnet build --configuration $BUILD_CONFIG -p:Version=${{ github.event.release.tag_name }} --no-restore
+      run: dotnet build --configuration $BUILD_CONFIG -p:Version=${{ github.event.release.tag_name || '0.0.1-test' }} --no-restore
 
     - name: Run tests
       run: dotnet test /p:Configuration=$BUILD_CONFIG --no-restore --no-build --verbosity normal
-
-      
-    # RELEASE UNSIGNED FOR NOW, new signing cert in a gcp wallet is being issued,
-    # waiting to get workload identity federation for this repo to be set up
-    # - name: Export certificate
-    #   id: write_file
-    #   uses: timheuer/base64-to-file@v1.1
-    #   with:
-    #     fileName: 'sign.cer'
-    #     encodedString: ${{ secrets.NUGET_SIGNING_CERT }}
-
-    # - name: Sign
-    #   run: dotnet nuget sign **\*.nupkg --certificate-path ${{ steps.write_file.outputs.filePath }} --certificate-password ${{ secrets.NUGET_SIGNING_CERT_PASSWORD }} --timestamper http://timestamp.digicert.com
+        
+    - name: Sign NuGet packages
+      run: |
+        certPath="${{ github.workspace }}/.github/signing_cert.cer"
+        jsignJar="${{ github.workspace }}/jsign.jar"
+        kmsKeyPath="projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1"
+        accessToken=$(gcloud auth print-access-token)
+        
+        echo "Signing NuGet packages with Jsign + Google Cloud KMS"
+        
+        # Find all .nupkg files (excluding symbols packages)
+        find . -name "*.nupkg" ! -name "*.symbols.nupkg" | while read package; do
+          echo "Signing $package"
+          
+          java -jar "$jsignJar" \
+            --storetype GOOGLECLOUD \
+            --keystore "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing" \
+            --storepass "$accessToken" \
+            --alias "EVCodeSignDojo/cryptoKeyVersions/1" \
+            --certfile "$certPath" \
+            --tsaurl "http://timestamp.digicert.com" \
+            --tsmode RFC3161 \
+            "$package"
+          
+          if [ $? -ne 0 ]; then
+            echo "Failed to sign package: $package"
+            exit 1
+          fi
+        done
+        
+        echo "All packages signed successfully"
 
     - name: Publish
-      run: dotnet nuget push **/*.nupkg --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}}
+      if: ${{ github.event_name == 'release' }}
+      run: dotnet nuget push '**/*.nupkg' --source 'https://api.nuget.org/v3/index.json' --api-key ${{secrets.NUGET_API_KEY}} --skip-duplicate
