@@ -102,13 +102,51 @@ jobs:
     - name: Debug - List available certificates and keys
       shell: pwsh
       run: |
-        Write-Host "=== Checking KMS CNG Provider Configuration ==="
+        Write-Host "=== GCP Project Information ==="
+        Write-Host "GCP_PROJECT_ID secret value: ${{ secrets.GCP_PROJECT_ID }}"
+        Write-Host "Getting project details..."
+        $projectInfo = gcloud projects describe ${{ secrets.GCP_PROJECT_ID }} --format=json | ConvertFrom-Json
+        Write-Host "Project ID (name): $($projectInfo.projectId)"
+        Write-Host "Project Number: $($projectInfo.projectNumber)"
+        
+        Write-Host "`n=== Checking KMS CNG Provider Configuration ==="
         if (Test-Path "C:\Windows\KMSCNG\config.yaml") {
           Write-Host "Config file exists:"
           Get-Content "C:\Windows\KMSCNG\config.yaml"
         } else {
           Write-Host "WARNING: Config file not found!"
         }
+        
+        Write-Host "`n=== Testing GCP Authentication ==="
+        gcloud auth list
+        
+        Write-Host "`n=== Testing KMS Key Access ==="
+        # Try to get the public key
+        gcloud kms keys versions get-public-key 1 `
+          --key EVCodeSignDojo `
+          --keyring EVCodeSigningKeyRing `
+          --location europe-west2 `
+          --project ${{ secrets.GCP_PROJECT_ID }} `
+          --output-file public-key.pem 2>&1
+        
+        if (Test-Path "public-key.pem") {
+          Write-Host "Successfully retrieved public key!"
+          Get-Content "public-key.pem"
+        } else {
+          Write-Host "Failed to retrieve public key"
+        }
+        
+        Write-Host "`n=== Listing accessible KMS keys ==="
+        gcloud kms keys list `
+          --keyring EVCodeSigningKeyRing `
+          --location europe-west2 `
+          --project ${{ secrets.GCP_PROJECT_ID }} 2>&1
+        
+        Write-Host "`n=== Checking IAM permissions on the key ==="
+        gcloud kms keys get-iam-policy EVCodeSignDojo `
+          --keyring EVCodeSigningKeyRing `
+          --location europe-west2 `
+          --project ${{ secrets.GCP_PROJECT_ID }} 2>&1
         
         Write-Host "`n=== Listing Certificate Stores ==="
         Get-ChildItem Cert:\CurrentUser\My | Format-Table Subject, Thumbprint, NotAfter
