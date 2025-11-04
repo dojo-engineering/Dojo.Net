@@ -157,34 +157,35 @@ jobs:
       run: |
         Write-Host "=== Importing Public Certificate ==="
         
-        # We should have the public key from the previous step
-        # Convert PEM to CER format and import
-        if (Test-Path "public-key.pem") {
-          # Import the certificate that was uploaded to NuGet
-          $certPath = "${{ github.workspace }}/publicert.cer"
-          
-          if (Test-Path $certPath) {
-            Write-Host "Importing certificate from $certPath"
-            
-            # Import to LocalMachine\My store
-            $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My
-            Write-Host "Certificate imported successfully"
-            Write-Host "Subject: $($cert.Subject)"
-            Write-Host "Thumbprint: $($cert.Thumbprint)"
-            Write-Host "NotAfter: $($cert.NotAfter)"
-            
-            # Verify it matches our expected thumbprint
-            if ($cert.Thumbprint -eq "90C591BF5D43D241871569B3A222A72DD76DFA8A") {
-              Write-Host "✓ Certificate thumbprint matches!"
-            } else {
-              Write-Host "✗ WARNING: Thumbprint mismatch! Expected: 90C591BF5D43D241871569B3A222A72DD76DFA8A, Got: $($cert.Thumbprint)"
-            }
-          } else {
-            Write-Host "ERROR: publicert.cer not found in repository"
-            exit 1
-          }
+        # Convert PEM to CER format using OpenSSL (comes with Git for Windows)
+        if (-not (Test-Path "public-key.pem")) {
+          Write-Host "ERROR: public-key.pem not found from previous step"
+          exit 1
+        }
+        
+        Write-Host "Converting public-key.pem to DER format..."
+        & "C:\Program Files\Git\usr\bin\openssl.exe" x509 -in public-key.pem -inform PEM -out publicert.cer -outform DER
+        
+        if (-not (Test-Path "publicert.cer")) {
+          Write-Host "ERROR: Failed to convert PEM to CER"
+          exit 1
+        }
+        
+        $certPath = "${{ github.workspace }}/publicert.cer"
+        Write-Host "Importing certificate from $certPath"
+        
+        # Import to LocalMachine\My store
+        $cert = Import-Certificate -FilePath $certPath -CertStoreLocation Cert:\LocalMachine\My
+        Write-Host "Certificate imported successfully"
+        Write-Host "Subject: $($cert.Subject)"
+        Write-Host "Thumbprint: $($cert.Thumbprint)"
+        Write-Host "NotAfter: $($cert.NotAfter)"
+        
+        # Verify it matches our expected thumbprint
+        if ($cert.Thumbprint -eq "90C591BF5D43D241871569B3A222A72DD76DFA8A") {
+          Write-Host "✓ Certificate thumbprint matches!"
         } else {
-          Write-Host "WARNING: public-key.pem not found from previous step"
+          Write-Host "✗ WARNING: Thumbprint mismatch! Expected: 90C591BF5D43D241871569B3A222A72DD76DFA8A, Got: $($cert.Thumbprint)"
         }
         
         Write-Host "`n=== Verifying Certificate Import ==="
