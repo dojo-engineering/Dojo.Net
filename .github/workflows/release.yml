@@ -231,11 +231,18 @@ jobs:
         
         Write-Host "Using SignTool from: $($signtoolPath.FullName)"
         
+        $certPath = Join-Path $PWD ".github\signing_cert.cer"
+        Write-Host "Certificate path: $certPath"
+        if (-not (Test-Path $certPath)) {
+          Write-Error "Certificate file not found at $certPath"
+          exit 1
+        }
+        
         $packages = Get-ChildItem -Recurse -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
         foreach ($package in $packages) {
           Write-Host "Signing $($package.FullName)"
           & $signtoolPath.FullName sign /v /debug /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
-            /f .github/signing_cert.cer `
+            /f $certPath `
             /csp "Google Cloud KMS Provider" `
             /kc "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1" `
             $package.FullName
