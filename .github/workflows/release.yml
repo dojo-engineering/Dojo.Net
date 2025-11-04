@@ -218,6 +218,8 @@ jobs:
         
     - name: Sign NuGet packages
       shell: pwsh
+      env:
+        WORKSPACE: ${{ github.workspace }}
       run: |
         # Find SignTool from Windows SDK
         $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue | 
@@ -231,7 +233,7 @@ jobs:
         
         Write-Host "Using SignTool from: $($signtoolPath.FullName)"
         
-        $certPath = Join-Path $PWD ".github\signing_cert.cer"
+        $certPath = Join-Path $env:WORKSPACE ".github\signing_cert.cer"
         Write-Host "Certificate path: $certPath"
         if (-not (Test-Path $certPath)) {
           Write-Error "Certificate file not found at $certPath"
