@@ -65,6 +65,7 @@ jobs:
     - name: Sign NuGet packages
       run: |
         certPath="${{ github.workspace }}/.github/signing_cert.cer"
+        jsignJar="${{ github.workspace }}/jsign.jar"
         kmsKeyPath="projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1"
         accessToken=$(gcloud auth print-access-token)
         
@@ -74,7 +75,7 @@ jobs:
         find . -name "*.nupkg" ! -name "*.symbols.nupkg" | while read package; do
           echo "Signing $package"
           
-          java -jar ${{ github.workspace }}/jsign.jar \
+          java -jar "$jsignJar" \
             --storetype GOOGLECLOUD \
             --keystore "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing" \
             --storepass "$accessToken" \
