@@ -88,10 +88,22 @@ jobs:
     - name: Sign NuGet packages
       shell: pwsh
       run: |
+        # Find SignTool from Windows SDK
+        $signtoolPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue | 
+                        Where-Object { $_.FullName -like "*\x64\*" } | 
+                        Select-Object -First 1
+        
+        if (-not $signtoolPath) {
+          Write-Error "Could not find signtool.exe"
+          exit 1
+        }
+        
+        Write-Host "Using SignTool from: $($signtoolPath.FullName)"
+        
         $packages = Get-ChildItem -Recurse -Filter "*.nupkg" | Where-Object { $_.Name -notlike "*.symbols.nupkg" }
         foreach ($package in $packages) {
           Write-Host "Signing $($package.FullName)"
-          & signtool sign /v /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
+          & $signtoolPath.FullName sign /v /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
             /sha1 90C591BF5D43D241871569B3A222A72DD76DFA8A `
             /csp "Google Cloud KMS Provider" `
             /kc "projects/${{ secrets.GCP_PROJECT_ID }}/locations/europe-west2/keyRings/EVCodeSigningKeyRing/cryptoKeys/EVCodeSignDojo/cryptoKeyVersions/1" `
